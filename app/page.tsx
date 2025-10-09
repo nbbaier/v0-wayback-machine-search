@@ -1,12 +1,32 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Search, Calendar, Clock, ExternalLink, Archive, Moon, Sun, Monitor, ArrowUpDown, Filter } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import {
+  Search,
+  Calendar,
+  Clock,
+  ExternalLink,
+  Archive,
+  Moon,
+  Sun,
+  Monitor,
+  ArrowUpDown,
+  Filter,
+  History,
+  X,
+  Eye,
+  BarChart3,
+  TrendingUp,
+  FileText,
+  CheckCircle2,
+  ScaleIcon as Skeleton,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 interface ArchiveResult {
   url: string
@@ -14,6 +34,7 @@ interface ArchiveResult {
   title: string
   status: string
   mimetype: string
+  length?: string
 }
 
 interface GroupedSnapshot {
@@ -33,11 +54,24 @@ export default function WaybackSearch() {
   const [filterStatus, setFilterStatus] = useState<string>("")
   const [filterMimeType, setFilterMimeType] = useState<string>("")
 
+  const [searchHistory, setSearchHistory] = useState<string[]>([])
+  const [showHistory, setShowHistory] = useState(false)
+
+  const [previewSnapshot, setPreviewSnapshot] = useState<ArchiveResult | null>(null)
+  const [showPreview, setShowPreview] = useState(false)
+
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") as "light" | "dark" | "system" | null
     const initialTheme = savedTheme || "system"
     setCurrentTheme(initialTheme)
     applyTheme(initialTheme)
+
+    const savedHistory = localStorage.getItem("searchHistory")
+    if (savedHistory) {
+      setSearchHistory(JSON.parse(savedHistory))
+    }
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
     const handleChange = () => {
@@ -49,19 +83,78 @@ export default function WaybackSearch() {
     return () => mediaQuery.removeEventListener("change", handleChange)
   }, [])
 
-  const applyTheme = (theme: "light" | "dark" | "system") => {
-    if (theme === "system") {
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+    const handleChange = () => {
+      if (currentTheme === "system") {
+        applyTheme("system")
+      }
+    }
+    mediaQuery.addEventListener("change", handleChange)
+    return () => mediaQuery.removeEventListener("change", handleChange)
+  }, [currentTheme])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // "/" to focus search
+      if (e.key === "/" && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+      }
+
+      // Escape to clear search or close modals
+      if (e.key === "Escape") {
+        if (showPreview) {
+          setShowPreview(false)
+        } else if (showHistory) {
+          setShowHistory(false)
+        } else if (document.activeElement === searchInputRef.current) {
+          searchInputRef.current?.blur()
+        }
+      }
+
+      // Ctrl/Cmd + K to toggle history
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault()
+        setShowHistory(!showHistory)
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [showPreview, showHistory])
+
+  const applyTheme = (themeValue: "light" | "dark" | "system") => {
+    if (themeValue === "system") {
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
       document.documentElement.classList.toggle("dark", prefersDark)
     } else {
-      document.documentElement.classList.toggle("dark", theme === "dark")
+      document.documentElement.classList.toggle("dark", themeValue === "dark")
     }
   }
 
-  const setTheme = (theme: "light" | "dark" | "system") => {
-    setCurrentTheme(theme)
-    localStorage.setItem("theme", theme)
-    applyTheme(theme)
+  const setTheme = (themeValue: "light" | "dark" | "system") => {
+    setCurrentTheme(themeValue)
+    localStorage.setItem("theme", themeValue)
+    applyTheme(themeValue)
+  }
+
+  const saveToHistory = (url: string) => {
+    const newHistory = [url, ...searchHistory.filter((h) => h !== url)].slice(0, 10)
+    setSearchHistory(newHistory)
+    localStorage.setItem("searchHistory", JSON.stringify(newHistory))
+  }
+
+  const removeFromHistory = (url: string) => {
+    const newHistory = searchHistory.filter((h) => h !== url)
+    setSearchHistory(newHistory)
+    localStorage.setItem("searchHistory", JSON.stringify(newHistory))
+  }
+
+  const clearHistory = () => {
+    setSearchHistory([])
+    localStorage.removeItem("searchHistory")
+    setShowHistory(false)
   }
 
   const handleSearch = async () => {
@@ -74,6 +167,8 @@ export default function WaybackSearch() {
         cleanUrl = "https://" + cleanUrl
       }
 
+      saveToHistory(cleanUrl)
+
       const apiUrl = new URL("/api/wayback", window.location.origin)
       apiUrl.searchParams.set("url", cleanUrl)
 
@@ -82,8 +177,6 @@ export default function WaybackSearch() {
         apiUrl.searchParams.set("to", selectedYear)
       }
 
-      console.log("[v0] Fetching from API:", apiUrl.toString())
-
       const response = await fetch(apiUrl.toString())
 
       if (!response.ok) {
@@ -91,18 +184,15 @@ export default function WaybackSearch() {
       }
 
       const data = await response.json()
-      console.log("[v0] Raw API response rows:", data.length)
 
       const snapshots = data.slice(1).map((row: string[]) => ({
         timestamp: row[0],
         url: row[1],
         status: row[2],
         mimetype: row[3],
+        length: row[4],
         title: `Snapshot from ${formatDate(row[0])}`,
       }))
-
-      console.log("[v0] Processed snapshots:", snapshots.length)
-      console.log("[v0] Sample snapshots:", snapshots.slice(0, 3))
 
       setResults(snapshots)
     } catch (error) {
@@ -188,10 +278,66 @@ export default function WaybackSearch() {
     return `https://web.archive.org/web/${timestamp}/${url}`
   }
 
+  const openPreview = (snapshot: ArchiveResult) => {
+    setPreviewSnapshot(snapshot)
+    setShowPreview(true)
+  }
+
   const uniqueStatuses = Array.from(new Set(results.map((r) => r.status))).sort()
   const uniqueMimeTypes = Array.from(new Set(results.map((r) => r.mimetype))).sort()
 
   const groupedResults = groupSnapshotsByDate(results)
+
+  const calculateStats = () => {
+    if (results.length === 0) return null
+
+    const statusCounts = results.reduce(
+      (acc, r) => {
+        acc[r.status] = (acc[r.status] || 0) + 1
+        return acc
+      },
+      {} as Record<string, number>,
+    )
+
+    const mimeTypeCounts = results.reduce(
+      (acc, r) => {
+        acc[r.mimetype] = (acc[r.mimetype] || 0) + 1
+        return acc
+      },
+      {} as Record<string, number>,
+    )
+
+    const timestamps = results.map((r) => r.timestamp).sort()
+    const firstSnapshot = timestamps[0]
+    const lastSnapshot = timestamps[timestamps.length - 1]
+
+    const totalSize = results.reduce((acc, r) => {
+      const size = Number.parseInt(r.length || "0")
+      return acc + (isNaN(size) ? 0 : size)
+    }, 0)
+
+    const avgSize = totalSize / results.length
+
+    return {
+      total: results.length,
+      statusCounts,
+      mimeTypeCounts,
+      firstSnapshot,
+      lastSnapshot,
+      totalSize,
+      avgSize,
+    }
+  }
+
+  const formatBytes = (bytes: number) => {
+    if (bytes === 0) return "0 Bytes"
+    const k = 1024
+    const sizes = ["Bytes", "KB", "MB", "GB"]
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i]
+  }
+
+  const stats = calculateStats()
 
   return (
     <div className="min-h-screen bg-background grid-pattern">
@@ -206,30 +352,38 @@ export default function WaybackSearch() {
                 <p className="text-sm text-muted-foreground">Modern Wayback Machine Search</p>
               </div>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
-                  {currentTheme === "light" && <Sun className="h-5 w-5" />}
-                  {currentTheme === "dark" && <Moon className="h-5 w-5" />}
-                  {currentTheme === "system" && <Monitor className="h-5 w-5" />}
-                  <span className="sr-only">Toggle theme</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme("light")}>
-                  <Sun className="h-4 w-4 mr-2" />
-                  Light
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                  <Moon className="h-4 w-4 mr-2" />
-                  Dark
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>
-                  <Monitor className="h-4 w-4 mr-2" />
-                  System
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground mr-4">
+                <kbd className="px-2 py-1 bg-muted rounded border">/ </kbd>
+                <span>to search</span>
+                <kbd className="px-2 py-1 bg-muted rounded border ml-2">⌘K</kbd>
+                <span>for history</span>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    {currentTheme === "light" && <Sun className="h-5 w-5" />}
+                    {currentTheme === "dark" && <Moon className="h-5 w-5" />}
+                    {currentTheme === "system" && <Monitor className="h-5 w-5" />}
+                    <span className="sr-only">Toggle theme</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setTheme("light")}>
+                    <Sun className="h-4 w-4 mr-2" />
+                    Light
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("dark")}>
+                    <Moon className="h-4 w-4 mr-2" />
+                    Dark
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("system")}>
+                    <Monitor className="h-4 w-4 mr-2" />
+                    System
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </header>
@@ -257,14 +411,63 @@ export default function WaybackSearch() {
             <CardDescription>Enter a website URL to explore its archived versions</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex gap-2">
-              <Input
-                placeholder="https://example.com"
-                value={searchUrl}
-                onChange={(e) => setSearchUrl(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                className="flex-1"
-              />
+            <div className="flex gap-2 relative">
+              <div className="flex-1 relative">
+                <Input
+                  ref={searchInputRef}
+                  placeholder="https://example.com"
+                  value={searchUrl}
+                  onChange={(e) => setSearchUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  onFocus={() => searchHistory.length > 0 && setShowHistory(true)}
+                  className="flex-1"
+                />
+                {showHistory && searchHistory.length > 0 && (
+                  <Card className="absolute top-full left-0 right-0 mt-2 z-10 shadow-lg">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-sm flex items-center gap-2">
+                          <History className="h-4 w-4" />
+                          Recent Searches
+                        </CardTitle>
+                        <div className="flex gap-2">
+                          <Button variant="ghost" size="sm" onClick={clearHistory}>
+                            Clear All
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => setShowHistory(false)}>
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-1">
+                      {searchHistory.map((url, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between gap-2 p-2 rounded hover:bg-accent cursor-pointer group"
+                          onClick={() => {
+                            setSearchUrl(url)
+                            setShowHistory(false)
+                          }}
+                        >
+                          <span className="text-sm truncate flex-1">{url}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              removeFromHistory(url)
+                            }}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
               <Button onClick={handleSearch} disabled={loading}>
                 {loading ? "Searching..." : "Search"}
               </Button>
@@ -287,8 +490,41 @@ export default function WaybackSearch() {
           </CardContent>
         </Card>
 
+        {loading && (
+          <div className="max-w-4xl mx-auto space-y-4">
+            <Skeleton className="h-8 w-64" />
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-6 w-48" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="space-y-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-8 w-16" />
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+            {[1, 2, 3].map((i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <Skeleton className="h-6 w-48" />
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {[1, 2].map((j) => (
+                    <Skeleton key={j} className="h-20 w-full" />
+                  ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
         {/* Results Section */}
-        {results.length > 0 && (
+        {results.length > 0 && !loading && (
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold flex items-center gap-2">
@@ -297,6 +533,89 @@ export default function WaybackSearch() {
               </h3>
             </div>
 
+            {stats && (
+              <Card className="mb-6 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-primary" />
+                    Statistics Overview
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                        <Archive className="h-4 w-4" />
+                        Total Snapshots
+                      </div>
+                      <div className="text-2xl font-bold">{stats.total}</div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                        <CheckCircle2 className="h-4 w-4" />
+                        Success Rate
+                      </div>
+                      <div className="text-2xl font-bold">
+                        {Math.round(((stats.statusCounts["200"] || 0) / stats.total) * 100)}%
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                        <FileText className="h-4 w-4" />
+                        Avg Size
+                      </div>
+                      <div className="text-2xl font-bold">{formatBytes(stats.avgSize)}</div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                        <TrendingUp className="h-4 w-4" />
+                        Date Range
+                      </div>
+                      <div className="text-sm font-medium">
+                        {formatDateOnly(stats.firstSnapshot)} - {formatDateOnly(stats.lastSnapshot)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-border/50">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-sm font-medium mb-2">Status Codes</div>
+                        <div className="flex flex-wrap gap-2">
+                          {Object.entries(stats.statusCounts)
+                            .sort(([, a], [, b]) => b - a)
+                            .slice(0, 5)
+                            .map(([status, count]) => (
+                              <Badge key={status} variant="outline" className="text-xs">
+                                {status}: {count}
+                              </Badge>
+                            ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-sm font-medium mb-2">Content Types</div>
+                        <div className="flex flex-wrap gap-2">
+                          {Object.entries(stats.mimeTypeCounts)
+                            .sort(([, a], [, b]) => b - a)
+                            .slice(0, 3)
+                            .map(([mime, count]) => (
+                              <Badge key={mime} variant="secondary" className="text-xs">
+                                {mime}: {count}
+                              </Badge>
+                            ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Filter & Sort Results */}
             <Card className="mb-6">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -404,29 +723,45 @@ export default function WaybackSearch() {
                     {group.snapshots.map((snapshot, snapshotIndex) => (
                       <div
                         key={snapshotIndex}
-                        className="flex items-center justify-between gap-4 p-3 rounded-lg bg-background/50 border border-border/50"
+                        className="flex items-start justify-between gap-4 p-3 rounded-lg bg-background/50 border border-border/50"
                       >
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
-                          <span className="font-mono font-medium">{formatTimeOnly(snapshot.timestamp)}</span>
-                          <Badge variant="outline" className="text-xs shrink-0">
-                            {snapshot.status}
-                          </Badge>
-                          {snapshot.mimetype && (
-                            <Badge variant="secondary" className="text-xs shrink-0">
-                              {snapshot.mimetype}
+                        <div className="flex flex-col gap-2 flex-1 min-w-0">
+                          <div className="flex items-center gap-3">
+                            <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <span className="font-mono font-medium">{formatTimeOnly(snapshot.timestamp)}</span>
+                            <Badge variant="outline" className="text-xs shrink-0">
+                              {snapshot.status}
                             </Badge>
-                          )}
+                            {snapshot.mimetype && (
+                              <Badge variant="secondary" className="text-xs shrink-0">
+                                {snapshot.mimetype}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground ml-7">
+                            {snapshot.length && (
+                              <span className="flex items-center gap-1">
+                                <FileText className="h-3 w-3" />
+                                {formatBytes(Number.parseInt(snapshot.length))}
+                              </span>
+                            )}
+                            <span className="truncate">{snapshot.url}</span>
+                          </div>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => window.open(getWaybackUrl(snapshot.timestamp, snapshot.url), "_blank")}
-                          className="shrink-0"
-                        >
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          View
-                        </Button>
+                        <div className="flex gap-2 shrink-0">
+                          <Button variant="ghost" size="sm" onClick={() => openPreview(snapshot)}>
+                            <Eye className="h-4 w-4 mr-2" />
+                            Preview
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(getWaybackUrl(snapshot.timestamp, snapshot.url), "_blank")}
+                          >
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            View
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </CardContent>
@@ -486,6 +821,51 @@ export default function WaybackSearch() {
           </div>
         )}
       </main>
+
+      <Dialog open={showPreview} onOpenChange={setShowPreview}>
+        <DialogContent className="max-w-6xl h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5" />
+              Snapshot Preview
+              {previewSnapshot && (
+                <span className="text-sm font-normal text-muted-foreground">
+                  {formatDate(previewSnapshot.timestamp)}
+                </span>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          {previewSnapshot && (
+            <div className="flex-1 flex flex-col gap-4">
+              <div className="flex items-center gap-2 text-sm flex-wrap">
+                <Badge variant="outline">{previewSnapshot.status}</Badge>
+                <Badge variant="secondary">{previewSnapshot.mimetype}</Badge>
+                {previewSnapshot.length && (
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    <FileText className="h-3 w-3" />
+                    {formatBytes(Number.parseInt(previewSnapshot.length))}
+                  </Badge>
+                )}
+                <span className="text-muted-foreground text-xs truncate flex-1">{previewSnapshot.url}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(getWaybackUrl(previewSnapshot.timestamp, previewSnapshot.url), "_blank")}
+                  className="ml-auto"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Open in New Tab
+                </Button>
+              </div>
+              <iframe
+                src={getWaybackUrl(previewSnapshot.timestamp, previewSnapshot.url)}
+                className="w-full flex-1 border rounded-lg"
+                title="Snapshot Preview"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Footer */}
       <footer className="border-t border-border/50 mt-20">
