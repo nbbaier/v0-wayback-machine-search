@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const cdxUrl = new URL("https://web.archive.org/cdx/search/cdx")
     cdxUrl.searchParams.set("url", url)
     cdxUrl.searchParams.set("output", "json")
-    cdxUrl.searchParams.set("fl", "timestamp,original,statuscode,mimetype")
+    cdxUrl.searchParams.set("fl", "timestamp,original,statuscode,mimetype,length")
 
     // Pass through year filters if provided
     const from = searchParams.get("from")
