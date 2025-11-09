@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: "TimeVault - Modern Wayback Machine Search",
   description: "Explore the web's archived history with a modern, intuitive interface",
   generator: "v0.app",
+  icons: {
+    icon: "/icon.svg",
+  },
 }
 
 export default function RootLayout({
