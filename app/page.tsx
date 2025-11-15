@@ -29,6 +29,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useWaybackSearch } from "@/lib/hooks/useWaybackSearch"
 import { VirtualizedSnapshotList } from "@/components/virtualized-snapshot-list"
+import { formatDate } from "@/lib/utils/formatters"
 
 interface ArchiveResult {
   url: string
@@ -186,22 +187,6 @@ export default function WaybackSearch() {
 
     saveToHistory(cleanUrl)
     setActiveSearchUrl(cleanUrl)
-  }
-
-  const formatDate = (timestamp: string) => {
-    const year = timestamp.slice(0, 4)
-    const month = timestamp.slice(4, 6)
-    const day = timestamp.slice(6, 8)
-    const hour = timestamp.slice(8, 10)
-    const minute = timestamp.slice(10, 12)
-
-    return new Date(`${year}-${month}-${day}T${hour}:${minute}:00`).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
   }
 
   const formatDateOnly = (timestamp: string) => {
