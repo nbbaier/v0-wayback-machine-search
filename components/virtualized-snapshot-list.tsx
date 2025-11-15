@@ -30,6 +30,12 @@ interface VirtualizedSnapshotListProps {
   openPreview: (snapshot: ArchiveResult) => void
 }
 
+// Height estimation constants for virtual scrolling
+// The header contains the date and snapshot count badge
+const HEADER_HEIGHT = 120
+// Each snapshot item includes timestamp, status, mimetype, and action buttons
+const SNAPSHOT_ITEM_HEIGHT = 100
+
 export function VirtualizedSnapshotList({
   groupedResults,
   formatDateOnly,
@@ -47,7 +53,7 @@ export function VirtualizedSnapshotList({
     estimateSize: (index) => {
       // Estimate size based on number of snapshots in the group
       const group = groupedResults[index]
-      return 120 + group.snapshots.length * 100 // Header + snapshots
+      return HEADER_HEIGHT + group.snapshots.length * SNAPSHOT_ITEM_HEIGHT
     },
     overscan: 2, // Render 2 extra groups above and below
   })
