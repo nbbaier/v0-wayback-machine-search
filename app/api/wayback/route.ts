@@ -12,18 +12,21 @@ interface CacheEntry {
 const cache = new Map<string, CacheEntry>()
 const CACHE_TTL = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 
-// Clean up expired cache entries periodically
-setInterval(() => {
+// Helper function to clean up expired cache entries (lazy cleanup)
+function cleanupExpiredEntries() {
   const now = Date.now()
   for (const [key, entry] of cache.entries()) {
     if (now - entry.timestamp > CACHE_TTL) {
       cache.delete(key)
     }
   }
-}, 60 * 60 * 1000) // Run cleanup every hour
+}
 
 export async function GET(request: NextRequest) {
   try {
+    // Perform lazy cleanup of expired cache entries
+    cleanupExpiredEntries()
+    
     const searchParams = request.nextUrl.searchParams
     const url = searchParams.get("url")
 
