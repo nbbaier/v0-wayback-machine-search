@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 
 // In-memory cache for API responses
 interface CacheEntry {
-  data: any
+  data: string[][]
   timestamp: number
 }
 
