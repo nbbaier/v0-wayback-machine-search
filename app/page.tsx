@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import {
   Search,
   Calendar,
@@ -27,6 +27,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { useWaybackSearch } from "@/lib/hooks/useWaybackSearch"
+import { VirtualizedSnapshotList } from "@/components/virtualized-snapshot-list"
 
 interface ArchiveResult {
   url: string
@@ -44,8 +46,7 @@ interface GroupedSnapshot {
 
 export default function WaybackSearch() {
   const [searchUrl, setSearchUrl] = useState("")
-  const [results, setResults] = useState<ArchiveResult[]>([])
-  const [loading, setLoading] = useState(false)
+  const [activeSearchUrl, setActiveSearchUrl] = useState<string>("")
   const [selectedYear, setSelectedYear] = useState<string>("")
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark" | "system">("system")
 
@@ -61,6 +62,24 @@ export default function WaybackSearch() {
   const [showPreview, setShowPreview] = useState(false)
 
   const searchInputRef = useRef<HTMLInputElement>(null)
+
+  // Use SWR for data fetching with caching
+  const searchParams = useMemo(() => {
+    if (!activeSearchUrl) return null
+
+    let cleanUrl = activeSearchUrl.trim()
+    if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
+      cleanUrl = "https://" + cleanUrl
+    }
+
+    return {
+      url: cleanUrl,
+      from: selectedYear || undefined,
+      to: selectedYear || undefined,
+    }
+  }, [activeSearchUrl, selectedYear])
+
+  const { data: results, isLoading, isError } = useWaybackSearch(searchParams)
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") as "light" | "dark" | "system" | null
@@ -157,50 +176,16 @@ export default function WaybackSearch() {
     setShowHistory(false)
   }
 
-  const handleSearch = async () => {
+  const handleSearch = () => {
     if (!searchUrl.trim()) return
 
-    setLoading(true)
-    try {
-      let cleanUrl = searchUrl.trim()
-      if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
-        cleanUrl = "https://" + cleanUrl
-      }
-
-      saveToHistory(cleanUrl)
-
-      const apiUrl = new URL("/api/wayback", window.location.origin)
-      apiUrl.searchParams.set("url", cleanUrl)
-
-      if (selectedYear) {
-        apiUrl.searchParams.set("from", selectedYear)
-        apiUrl.searchParams.set("to", selectedYear)
-      }
-
-      const response = await fetch(apiUrl.toString())
-
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`)
-      }
-
-      const data = await response.json()
-
-      const snapshots = data.slice(1).map((row: string[]) => ({
-        timestamp: row[0],
-        url: row[1],
-        status: row[2],
-        mimetype: row[3],
-        length: row[4],
-        title: `Snapshot from ${formatDate(row[0])}`,
-      }))
-
-      setResults(snapshots)
-    } catch (error) {
-      console.error("[v0] Search failed:", error)
-      setResults([])
-    } finally {
-      setLoading(false)
+    let cleanUrl = searchUrl.trim()
+    if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
+      cleanUrl = "https://" + cleanUrl
     }
+
+    saveToHistory(cleanUrl)
+    setActiveSearchUrl(cleanUrl)
   }
 
   const formatDate = (timestamp: string) => {
@@ -468,8 +453,8 @@ export default function WaybackSearch() {
                   </Card>
                 )}
               </div>
-              <Button onClick={handleSearch} disabled={loading}>
-                {loading ? "Searching..." : "Search"}
+              <Button onClick={handleSearch} disabled={isLoading}>
+                {isLoading ? "Searching..." : "Search"}
               </Button>
             </div>
 
@@ -490,7 +475,7 @@ export default function WaybackSearch() {
           </CardContent>
         </Card>
 
-        {loading && (
+        {isLoading && (
           <div className="max-w-4xl mx-auto space-y-4">
             <Skeleton className="h-8 w-64" />
             <Card>
@@ -524,7 +509,7 @@ export default function WaybackSearch() {
         )}
 
         {/* Results Section */}
-        {results.length > 0 && !loading && (
+        {results.length > 0 && !isLoading && (
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold flex items-center gap-2">
@@ -707,72 +692,19 @@ export default function WaybackSearch() {
               </CardContent>
             </Card>
 
-            <div className="grid gap-4">
-              {groupedResults.map((group, groupIndex) => (
-                <Card key={groupIndex} className="hover:bg-accent/50 transition-colors">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-5 w-5 text-primary" />
-                      <CardTitle className="text-lg">{formatDateOnly(group.date + "000000")}</CardTitle>
-                      <Badge variant="secondary" className="ml-auto">
-                        {group.snapshots.length} {group.snapshots.length === 1 ? "snapshot" : "snapshots"}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {group.snapshots.map((snapshot, snapshotIndex) => (
-                      <div
-                        key={snapshotIndex}
-                        className="flex items-start justify-between gap-4 p-3 rounded-lg bg-background/50 border border-border/50"
-                      >
-                        <div className="flex flex-col gap-2 flex-1 min-w-0">
-                          <div className="flex items-center gap-3">
-                            <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
-                            <span className="font-mono font-medium">{formatTimeOnly(snapshot.timestamp)}</span>
-                            <Badge variant="outline" className="text-xs shrink-0">
-                              {snapshot.status}
-                            </Badge>
-                            {snapshot.mimetype && (
-                              <Badge variant="secondary" className="text-xs shrink-0">
-                                {snapshot.mimetype}
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-4 text-xs text-muted-foreground ml-7">
-                            {snapshot.length && (
-                              <span className="flex items-center gap-1">
-                                <FileText className="h-3 w-3" />
-                                {formatBytes(Number.parseInt(snapshot.length))}
-                              </span>
-                            )}
-                            <span className="truncate">{snapshot.url}</span>
-                          </div>
-                        </div>
-                        <div className="flex gap-2 shrink-0">
-                          <Button variant="ghost" size="sm" onClick={() => openPreview(snapshot)}>
-                            <Eye className="h-4 w-4 mr-2" />
-                            Preview
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => window.open(getWaybackUrl(snapshot.timestamp, snapshot.url), "_blank")}
-                          >
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            View
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <VirtualizedSnapshotList
+              groupedResults={groupedResults}
+              formatDateOnly={formatDateOnly}
+              formatTimeOnly={formatTimeOnly}
+              formatBytes={formatBytes}
+              getWaybackUrl={getWaybackUrl}
+              openPreview={openPreview}
+            />
           </div>
         )}
 
         {/* Empty State */}
-        {!loading && results.length === 0 && searchUrl && (
+        {!isLoading && results.length === 0 && activeSearchUrl && (
           <div className="text-center py-12">
             <Archive className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">No archives found</h3>
@@ -780,8 +712,24 @@ export default function WaybackSearch() {
           </div>
         )}
 
+        {/* Error State */}
+        {isError && (
+          <div className="text-center py-12 max-w-4xl mx-auto">
+            <Card className="border-destructive">
+              <CardHeader>
+                <CardTitle className="text-destructive">Search Failed</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Failed to fetch archive data. Please try again later.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Features Grid */}
-        {results.length === 0 && !searchUrl && (
+        {results.length === 0 && !activeSearchUrl && !isLoading && (
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-16">
             <Card>
               <CardHeader>
