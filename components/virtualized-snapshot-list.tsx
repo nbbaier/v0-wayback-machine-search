@@ -56,7 +56,7 @@ interface VirtualizedSnapshotListProps {
 /**
  * Height estimation for group header (date + badge)
  * Used by virtualizer to calculate scroll positions
- * Increased to account for responsive wrapping on mobile
+ * Adjusted for compact layout while accounting for responsive wrapping
  */
 const HEADER_HEIGHT = 100
 
