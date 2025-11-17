@@ -1,6 +1,6 @@
 "use client"
 
-import { Archive, Terminal, Table, CalendarDays } from 'lucide-react'
+import { Archive, Terminal, Table, CalendarDays, LayoutGrid } from 'lucide-react'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -18,7 +18,29 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-6">
+          <Link href="/cards" className="group">
+            <Card className="h-full transition-all hover:shadow-lg hover:border-primary cursor-pointer">
+              <CardHeader>
+                <div className="flex items-center justify-center mb-4">
+                  <LayoutGrid className="h-16 w-16 text-primary group-hover:scale-110 transition-transform" />
+                </div>
+                <CardTitle className="text-center text-2xl">Cards</CardTitle>
+                <CardDescription className="text-center">
+                  Date-grouped card layout
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-sm text-muted-foreground space-y-2">
+                  <li>• One card per date</li>
+                  <li>• Grouped snapshots</li>
+                  <li>• Clean organization</li>
+                  <li>• Easy browsing</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </Link>
+
           <Link href="/minimal" className="group">
             <Card className="h-full transition-all hover:shadow-lg hover:border-primary cursor-pointer">
               <CardHeader>
@@ -27,14 +49,14 @@ export default function HomePage() {
                 </div>
                 <CardTitle className="text-center text-2xl">Minimal</CardTitle>
                 <CardDescription className="text-center">
-                  Clean, terminal-inspired interface
+                  Clean, distraction-free interface
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="text-sm text-muted-foreground space-y-2">
-                  <li>• Monospace typography</li>
+                  <li>• Simple and elegant</li>
                   <li>• Text-focused design</li>
-                  <li>• Keyboard-first navigation</li>
+                  <li>• Refined typography</li>
                   <li>• Minimal distractions</li>
                 </ul>
               </CardContent>
