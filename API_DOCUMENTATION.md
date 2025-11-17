@@ -25,15 +25,15 @@ TimeVault uses a Next.js API route (`/api/wayback`) as a proxy to the Internet A
 
 ### Endpoint
 
-```
+\`\`\`
 GET /api/wayback
-```
+\`\`\`
 
 ### Base URL
 
-```
+\`\`\`
 https://your-deployment-url.vercel.app/api/wayback
-```
+\`\`\`
 
 ### Query Parameters
 
@@ -63,7 +63,7 @@ No special headers required. Standard HTTP GET request.
 
 #### Success Response (200 OK)
 
-```json
+\`\`\`json
 [
   [
     "timestamp",
@@ -87,7 +87,7 @@ No special headers required. Standard HTTP GET request.
     "12456"
   ]
 ]
-```
+\`\`\`
 
 **Response Structure:**
 - First array element is the header row (field names)
@@ -107,25 +107,25 @@ No special headers required. Standard HTTP GET request.
 #### Error Responses
 
 **400 Bad Request** - Missing required parameter
-```json
+\`\`\`json
 {
   "error": "URL parameter is required"
 }
-```
+\`\`\`
 
 **500 Internal Server Error** - CDX API failure
-```json
+\`\`\`json
 {
   "error": "Failed to fetch from Wayback Machine"
 }
-```
+\`\`\`
 
 **502 Bad Gateway** - CDX API returns error
-```json
+\`\`\`json
 {
   "error": "Wayback Machine API error: 503"
 }
-```
+\`\`\`
 
 ## Wayback Machine CDX API
 
@@ -133,9 +133,9 @@ TimeVault proxies requests to the Internet Archive's CDX Server API.
 
 ### CDX API Endpoint
 
-```
+\`\`\`
 https://web.archive.org/cdx/search/cdx
-```
+\`\`\`
 
 ### Parameters Used
 
@@ -152,9 +152,9 @@ TimeVault forwards the following parameters to the CDX API:
 
 ### Example CDX Request
 
-```
+\`\`\`
 https://web.archive.org/cdx/search/cdx?url=example.com&output=json&fl=timestamp,original,statuscode,mimetype,length&from=2020&to=2024&limit=1000
-```
+\`\`\`
 
 ### CDX API Documentation
 
@@ -177,7 +177,7 @@ TimeVault implements a two-tier caching strategy for optimal performance.
 - **Cleanup:** Lazy cleanup on each request
 
 **Cache Structure:**
-```typescript
+\`\`\`typescript
 interface CacheEntry {
   data: string[][]      // CDX API response
   timestamp: number     // Cache creation time
@@ -185,7 +185,7 @@ interface CacheEntry {
 
 const cache = new Map<string, CacheEntry>()
 const CACHE_TTL = 24 * 60 * 60 * 1000 // 24 hours
-```
+\`\`\`
 
 **Behavior:**
 - Cache hit returns cached data with `X-Cache: HIT` header
@@ -202,14 +202,14 @@ const CACHE_TTL = 24 * 60 * 60 * 1000 // 24 hours
 **Implementation:** SWR (stale-while-revalidate)
 
 **Configuration:**
-```typescript
+\`\`\`typescript
 {
   revalidateOnFocus: false,       // Don't refetch on window focus
   revalidateOnReconnect: false,   // Don't refetch on reconnect
   dedupingInterval: 60000,        // Dedupe requests within 60s
   keepPreviousData: true          // Show old data while loading new
 }
-```
+\`\`\`
 
 **Behavior:**
 - Deduplicates identical requests within 60 seconds
@@ -239,11 +239,11 @@ const CACHE_TTL = 24 * 60 * 60 * 1000 // 24 hours
 **Scenario:** CDX API unreachable
 
 **Response:**
-```json
+\`\`\`json
 {
   "error": "Failed to fetch from Wayback Machine"
 }
-```
+\`\`\`
 
 **HTTP Status:** 500
 
@@ -257,11 +257,11 @@ const CACHE_TTL = 24 * 60 * 60 * 1000 // 24 hours
 **Scenario:** Missing URL parameter
 
 **Response:**
-```json
+\`\`\`json
 {
   "error": "URL parameter is required"
 }
-```
+\`\`\`
 
 **HTTP Status:** 400
 
@@ -274,11 +274,11 @@ const CACHE_TTL = 24 * 60 * 60 * 1000 // 24 hours
 **Scenario:** CDX API returns non-200 status
 
 **Response:**
-```json
+\`\`\`json
 {
   "error": "Wayback Machine API error: 503"
 }
-```
+\`\`\`
 
 **HTTP Status:** Same as CDX API
 
@@ -302,7 +302,7 @@ CDX timestamps use the format: `YYYYMMDDHHmmss`
 - Second: 00
 
 **Parsing in JavaScript:**
-```javascript
+\`\`\`javascript
 const timestamp = "20240115120000"
 const year = timestamp.slice(0, 4)    // "2024"
 const month = timestamp.slice(4, 6)   // "01"
@@ -312,73 +312,73 @@ const minute = timestamp.slice(10, 12) // "00"
 const second = timestamp.slice(12, 14) // "00"
 
 const date = new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}Z`)
-```
+\`\`\`
 
 ### Wayback Machine URL Format
 
 To construct a link to view a snapshot:
 
-```
+\`\`\`
 https://web.archive.org/web/{timestamp}/{original_url}
-```
+\`\`\`
 
 **Example:**
-```
+\`\`\`
 https://web.archive.org/web/20240115120000/https://example.com/
-```
+\`\`\`
 
 ## Examples
 
 ### Basic Search
 
 **Request:**
-```bash
+\`\`\`bash
 curl "https://your-app.vercel.app/api/wayback?url=example.com"
-```
+\`\`\`
 
 **Response:**
-```json
+\`\`\`json
 [
   ["timestamp", "original", "statuscode", "mimetype", "length"],
   ["20240115120000", "https://example.com/", "200", "text/html", "12345"],
   ["20240116083000", "https://example.com/", "200", "text/html", "12456"]
 ]
-```
+\`\`\`
 
 ### Search with Year Filter
 
 **Request:**
-```bash
+\`\`\`bash
 curl "https://your-app.vercel.app/api/wayback?url=example.com&from=2023&to=2023"
-```
+\`\`\`
 
 **Response:**
-```json
+\`\`\`json
 [
   ["timestamp", "original", "statuscode", "mimetype", "length"],
   ["20230101000000", "https://example.com/", "200", "text/html", "11234"],
   ["20230615120000", "https://example.com/", "200", "text/html", "11567"]
 ]
-```
+\`\`\`
 
 ### No Results
 
 **Request:**
-```bash
+\`\`\`bash
 curl "https://your-app.vercel.app/api/wayback?url=never-existed-site-12345.com"
-```
+\`\`\`
 
 **Response:**
-```json
+\`\`\`json
 [
   ["timestamp", "original", "statuscode", "mimetype", "length"]
 ]
-```
+\`\`\`
 
 ### JavaScript Usage
 
 **Using fetch:**
-```javascript
+\`\`\`javascript
 async function searchWayback(url, from, to) {
   const params = new URLSearchParams({ url })
   if (from) params.set('from', from)
@@ -407,10 +407,10 @@ async function searchWayback(url, from, to) {
 // Usage
 const results = await searchWayback('example.com', '2023', '2024')
 console.log(`Found ${results.length} snapshots`)
-```
+\`\`\`
 
 **Using SWR (as in TimeVault):**
-```javascript
+\`\`\`javascript
 import useSWR from 'swr'
 
 const fetcher = async (url) => {
@@ -439,7 +439,7 @@ function useWaybackSearch(url, from, to) {
 
   return { snapshots: data || [], error, isLoading }
 }
-```
+\`\`\`
 
 ## Rate Limiting
 

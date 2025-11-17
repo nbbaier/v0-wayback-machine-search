@@ -22,7 +22,7 @@ TimeVault is a modern single-page application (SPA) built with Next.js 14 using 
 
 ### High-Level Architecture
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────┐
 │                         Browser                              │
 │  ┌───────────────────────────────────────────────────────┐  │
@@ -54,11 +54,11 @@ TimeVault is a modern single-page application (SPA) built with Next.js 14 using 
 │              https://web.archive.org/cdx/search/cdx          │
 │              (External API - Read Only)                      │
 └─────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 ### Request Flow
 
-```
+\`\`\`
 User Input → useWaybackSearch Hook → /api/wayback Route → CDX API
                 ↓                          ↓                  ↓
            SWR Cache ←── JSON Response ←─ In-Memory Cache ←─┘
@@ -68,7 +68,7 @@ User Input → useWaybackSearch Hook → /api/wayback Route → CDX API
           Virtual List
                 ↓
             User Display
-```
+\`\`\`
 
 ## Tech Stack
 
@@ -144,7 +144,7 @@ User Input → useWaybackSearch Hook → /api/wayback Route → CDX API
 
 ## Project Structure
 
-```
+\`\`\`
 v0-wayback-machine-search/
 │
 ├── app/                          # Next.js App Router
@@ -185,7 +185,7 @@ v0-wayback-machine-search/
     ├── tailwind.config.ts        # Tailwind CSS configuration
     ├── postcss.config.mjs        # PostCSS configuration
     └── components.json           # shadcn/ui configuration
-```
+\`\`\`
 
 ### File Responsibilities
 
@@ -222,7 +222,7 @@ v0-wayback-machine-search/
 
 ### Search Flow
 
-```
+\`\`\`
 1. User enters URL
    ↓
 2. useState updates searchUrl
@@ -269,11 +269,11 @@ v0-wayback-machine-search/
     ├── Virtual scrolling for performance
     ├── Only visible items in DOM
     └── User sees results
-```
+\`\`\`
 
 ### Filter Flow
 
-```
+\`\`\`
 User changes filter
    ↓
 useState updates filter state
@@ -288,7 +288,7 @@ groupSnapshotsByDate() re-executes
 VirtualizedSnapshotList re-renders
    ↓
 User sees filtered results (instant, no API call)
-```
+\`\`\`
 
 ## Key Components
 
@@ -297,7 +297,7 @@ User sees filtered results (instant, no API call)
 **Purpose:** Centralize data fetching logic with caching
 
 **Implementation:**
-```typescript
+\`\`\`typescript
 export function useWaybackSearch(params: WaybackSearchParams | null) {
   const apiUrl = params ? buildApiUrl(params) : null
 
@@ -314,7 +314,7 @@ export function useWaybackSearch(params: WaybackSearchParams | null) {
 
   return { data: data || [], isLoading, isError: !!error, error }
 }
-```
+\`\`\`
 
 **Features:**
 - Null-safe (returns empty array when no params)
@@ -327,7 +327,7 @@ export function useWaybackSearch(params: WaybackSearchParams | null) {
 **Purpose:** Efficiently render thousands of snapshots without performance degradation
 
 **Implementation:**
-```typescript
+\`\`\`typescript
 const virtualizer = useVirtualizer({
   count: groupedResults.length,
   getScrollElement: () => parentRef.current,
@@ -337,7 +337,7 @@ const virtualizer = useVirtualizer({
   },
   overscan: 2,
 })
-```
+\`\`\`
 
 **Performance Characteristics:**
 - O(1) rendering complexity (constant number of DOM nodes)
@@ -350,7 +350,7 @@ const virtualizer = useVirtualizer({
 **Purpose:** Reduce load on Wayback Machine API and improve response times
 
 **Implementation:**
-```typescript
+\`\`\`typescript
 interface CacheEntry {
   data: string[][]
   timestamp: number
@@ -368,7 +368,7 @@ function cleanupExpiredEntries() {
     }
   }
 }
-```
+\`\`\`
 
 **Characteristics:**
 - In-memory storage (Map)
@@ -496,12 +496,12 @@ function cleanupExpiredEntries() {
 ### 6. Memoization
 
 **Used in app/page.tsx:**
-```typescript
+\`\`\`typescript
 const searchParams = useMemo(() => {
   if (!activeSearchUrl) return null
   return { url: cleanUrl, from: selectedYear, to: selectedYear }
 }, [activeSearchUrl, selectedYear])
-```
+\`\`\`
 
 **Impact:**
 - Prevents unnecessary re-renders
@@ -544,7 +544,7 @@ Used for:
 
 ### Cache Layers
 
-```
+\`\`\`
 ┌──────────────────────────────────────────────┐
 │  Layer 1: SWR Client Cache                   │
 │  - Duration: 60s deduplication               │
@@ -565,7 +565,7 @@ Used for:
 │  - Scope: Global                             │
 │  - Storage: Internet Archive infrastructure  │
 └──────────────────────────────────────────────┘
-```
+\`\`\`
 
 ### Cache Keys
 
@@ -587,7 +587,7 @@ Used for:
 ### Tailwind Configuration
 
 **Custom Design System:**
-```javascript
+\`\`\`javascript
 {
   colors: {
     border: "hsl(var(--border))",
@@ -597,10 +597,10 @@ Used for:
     // ... more colors
   }
 }
-```
+\`\`\`
 
 **CSS Variables (styles/globals.css):**
-```css
+\`\`\`css
 :root {
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
@@ -612,7 +612,7 @@ Used for:
   --foreground: 210 40% 98%;
   /* ... more variables */
 }
-```
+\`\`\`
 
 ### Theme System
 

@@ -45,12 +45,12 @@ TimeVault accepts URLs in multiple formats:
 - `subdomain.example.com`
 
 **Examples:**
-```
+\`\`\`
 github.com
 www.nytimes.com
 https://docs.python.org
 old-website.com/blog
-```
+\`\`\`
 
 ### Quick Year Filters
 
@@ -84,12 +84,12 @@ The statistics card shows:
 - **Content Types** - Most common MIME types
 
 **Example:**
-```
+\`\`\`
 Total Snapshots: 1,234
 Success Rate: 87%
 Avg Size: 145 KB
 Date Range: Jan 1, 2020 - Dec 31, 2024
-```
+\`\`\`
 
 ### Snapshot Details
 
@@ -265,10 +265,10 @@ Only visible snapshots are rendered in the DOM. As you scroll, snapshots are add
 ### Getting Better Results
 
 **Use specific URLs:**
-```
+\`\`\`
 Good: github.com/torvalds/linux
 Better: github.com/torvalds/linux/commits
-```
+\`\`\`
 
 **Try different URL variations:**
 - With/without `www`
@@ -315,40 +315,40 @@ Better: github.com/torvalds/linux/commits
 ### Academic Research
 
 **Finding historical sources:**
-```
+\`\`\`
 1. Search: old-news-site.com/archives
 2. Filter: Year 2015, Status 200
 3. Sort: Oldest First
 4. Preview snapshots to find relevant articles
-```
+\`\`\`
 
 ### Web Development
 
 **Checking old designs:**
-```
+\`\`\`
 1. Search: competitor-site.com
 2. Filter: Year 2018, Type text/html
 3. Preview snapshots to study design evolution
-```
+\`\`\`
 
 ### Digital Archaeology
 
 **Recovering lost content:**
-```
+\`\`\`
 1. Search: defunct-website.com
 2. Filter: Status 200 (ignore errors)
 3. Sort: Newest First (last working version)
 4. Export results for archival
-```
+\`\`\`
 
 ### Legal/Compliance
 
 **Evidence gathering:**
-```
+\`\`\`
 1. Search: specific-page.com/terms
 2. Note: Statistics show date range
 3. Export: Use browser print/save (export feature coming soon)
-```
+\`\`\`
 
 ## FAQ
 

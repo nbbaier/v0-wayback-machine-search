@@ -1,26 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useMemo } from "react"
-import {
-  Search,
-  Calendar,
-  Clock,
-  ExternalLink,
-  Archive,
-  Moon,
-  Sun,
-  Monitor,
-  ArrowUpDown,
-  Filter,
-  History,
-  X,
-  Eye,
-  BarChart3,
-  TrendingUp,
-  FileText,
-  CheckCircle2,
-  Loader2,
-} from "lucide-react"
+import { Search, Calendar, Clock, ExternalLink, Archive, Moon, Sun, Monitor, ArrowUpDown, Filter, History, X, Eye, BarChart3, TrendingUp, FileText, CheckCircle2, Loader2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -313,28 +294,28 @@ export default function WaybackSearch() {
     <div className="min-h-screen bg-background grid-pattern">
       {/* Header */}
       <header className="border-b border-border/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 sm:py-6">
+        <div className="container mx-auto px-4 py-2 sm:py-3">
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <Archive className="h-6 w-6 sm:h-8 sm:w-8 text-primary shrink-0" />
+            <div className="flex items-center gap-2 min-w-0">
+              <Archive className="h-5 w-5 sm:h-6 sm:w-6 text-primary shrink-0" />
               <div className="min-w-0">
-                <h1 className="text-xl sm:text-2xl font-bold text-balance">TimeVault</h1>
-                <p className="text-xs sm:text-sm text-muted-foreground hidden xs:block">Modern Wayback Machine Search</p>
+                <h1 className="text-lg sm:text-xl font-bold text-balance">TimeVault</h1>
+                <p className="text-xs text-muted-foreground hidden xs:block">Modern Wayback Machine Search</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground mr-4">
-                <kbd className="px-2 py-1 bg-muted rounded border">/ </kbd>
-                <span>to search</span>
-                <kbd className="px-2 py-1 bg-muted rounded border ml-2">⌘K</kbd>
-                <span>for history</span>
+              <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground mr-2">
+                <kbd className="px-1.5 py-0.5 bg-muted rounded border text-[10px]">/ </kbd>
+                <span className="text-[11px]">search</span>
+                <kbd className="px-1.5 py-0.5 bg-muted rounded border ml-2 text-[10px]">⌘K</kbd>
+                <span className="text-[11px]">history</span>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon">
-                    {currentTheme === "light" && <Sun className="h-5 w-5" />}
-                    {currentTheme === "dark" && <Moon className="h-5 w-5" />}
-                    {currentTheme === "system" && <Monitor className="h-5 w-5" />}
+                  <Button variant="outline" size="sm">
+                    {currentTheme === "light" && <Sun className="h-4 w-4" />}
+                    {currentTheme === "dark" && <Moon className="h-4 w-4" />}
+                    {currentTheme === "system" && <Monitor className="h-4 w-4" />}
                     <span className="sr-only">Toggle theme</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -358,29 +339,29 @@ export default function WaybackSearch() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 sm:py-8 md:py-12">
+      <main className="container mx-auto px-4 py-4 sm:py-6">
         {/* Hero Section */}
-        <div className="text-center mb-8 md:mb-12">
-          <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 md:mb-6 text-balance px-4">
+        <div className="text-center mb-4 sm:mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 text-balance px-4">
             Explore the web's
             <span className="block text-primary">archived history</span>
           </h2>
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto text-pretty px-4">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto text-pretty px-4">
             Search through billions of web pages archived over time. Discover how websites looked and what they
             contained in the past.
           </p>
         </div>
 
         {/* Search Section */}
-        <Card className="max-w-4xl mx-auto mb-6 sm:mb-8 md:mb-12">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="h-5 w-5" />
+        <Card className="max-w-4xl mx-auto mb-3 sm:mb-4">
+          <CardHeader className="pb-2 pt-3 px-4">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Search className="h-4 w-4" />
               Search Archive
             </CardTitle>
-            <CardDescription>Enter a website URL to explore its archived versions</CardDescription>
+            <CardDescription className="text-xs">Enter a website URL to explore its archived versions</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-2 px-4 pb-3">
             <div className="flex gap-2 relative">
               <div className="flex-1 relative">
                 <Input
@@ -390,53 +371,52 @@ export default function WaybackSearch() {
                   onChange={(e) => setSearchUrl(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   onFocus={() => searchHistory.length > 0 && setShowHistory(true)}
-                  className="flex-1"
+                  className="flex-1 h-9 text-sm"
                 />
                 {showHistory && searchHistory.length > 0 && (
-                  <Card className="absolute top-full left-0 right-0 mt-2 z-10 shadow-lg">
-                    <CardHeader className="pb-2 pt-3 px-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <CardTitle className="text-xs sm:text-sm flex items-center gap-1.5">
-                          <History className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                          <span className="hidden sm:inline">Recent Searches</span>
-                          <span className="sm:hidden">Recent</span>
-                        </CardTitle>
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" onClick={clearHistory} className="text-xs h-7 px-2">
-                            <span className="hidden sm:inline">Clear All</span>
-                            <span className="sm:hidden">Clear</span>
-                          </Button>
-                          <Button variant="ghost" size="sm" onClick={() => setShowHistory(false)} className="h-7 w-7 p-0">
-                            <X className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
+                  <Card className="absolute top-full left-0 right-0 mt-1 z-10 shadow-lg">
+                    <div className="flex items-center justify-between px-3 py-2 border-b">
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        <span className="text-sm">Recent searches</span>
                       </div>
-                    </CardHeader>
-                    <CardContent className="space-y-0.5 px-3 pb-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={clearHistory}
+                        className="text-xs h-auto p-0 hover:bg-transparent text-muted-foreground hover:text-foreground"
+                      >
+                        Clear all
+                      </Button>
+                    </div>
+                    <div className="py-1">
                       {searchHistory.map((url, index) => (
                         <div
                           key={index}
-                          className="flex items-center justify-between gap-2 p-1.5 rounded hover:bg-accent cursor-pointer group"
+                          className="flex items-center justify-between gap-2 px-3 py-2 hover:bg-accent cursor-pointer group"
                           onClick={() => {
                             setSearchUrl(url)
                             setShowHistory(false)
                           }}
                         >
-                          <span className="text-xs sm:text-sm truncate flex-1">{url}</span>
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <span className="text-sm truncate">{url}</span>
+                          </div>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                            className="opacity-0 group-hover:opacity-100 h-auto w-auto p-0 hover:bg-transparent"
                             onClick={(e) => {
                               e.stopPropagation()
                               removeFromHistory(url)
                             }}
                           >
-                            <X className="h-3 w-3" />
+                            <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                           </Button>
                         </div>
                       ))}
-                    </CardContent>
+                    </div>
                   </Card>
                 )}
               </div>
@@ -453,13 +433,13 @@ export default function WaybackSearch() {
             </div>
 
             {/* Quick filters */}
-            <div className="flex flex-wrap gap-2">
-              <span className="text-sm text-muted-foreground">Quick filters:</span>
+            <div className="flex flex-wrap gap-1.5">
+              <span className="text-xs text-muted-foreground">Quick filters:</span>
               {["2020", "2021", "2022", "2023", "2024", "2025"].map((year) => (
                 <Badge
                   key={year}
                   variant={selectedYear === year ? "default" : "secondary"}
-                  className="cursor-pointer"
+                  className="cursor-pointer text-xs h-5"
                   onClick={() => setSelectedYear(selectedYear === year ? "" : year)}
                 >
                   {year}
@@ -470,12 +450,12 @@ export default function WaybackSearch() {
         </Card>
 
         {isLoading && (
-          <div className="max-w-4xl mx-auto py-16">
+          <div className="max-w-4xl mx-auto py-8">
             <Card>
-              <CardContent className="flex flex-col items-center justify-center py-16">
-                <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Searching archives...</h3>
-                <p className="text-muted-foreground text-center">
+              <CardContent className="flex flex-col items-center justify-center py-8">
+                <Loader2 className="h-10 w-10 text-primary animate-spin mb-3" />
+                <h3 className="text-lg font-semibold mb-1">Searching archives...</h3>
+                <p className="text-muted-foreground text-center text-sm">
                   Querying the Wayback Machine for snapshots
                 </p>
               </CardContent>
@@ -486,59 +466,59 @@ export default function WaybackSearch() {
         {/* Results Section */}
         {results.length > 0 && !isLoading && (
           <div className="max-w-4xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold flex items-center gap-2">
-                <Clock className="h-6 w-6" />
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <Clock className="h-5 w-5" />
                 Archived Versions ({groupedResults.reduce((acc, g) => acc + g.snapshots.length, 0)} snapshots)
               </h3>
             </div>
 
             {stats && (
-              <Card className="mb-4 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-                <CardHeader className="pb-2 pt-3 px-4">
-                  <CardTitle className="text-sm sm:text-base flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4 text-primary" />
+              <Card className="mb-3 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+                <CardHeader className="pb-1.5 pt-2 px-3">
+                  <CardTitle className="text-sm flex items-center gap-1.5">
+                    <BarChart3 className="h-3.5 w-3.5 text-primary" />
                     Statistics
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="px-4 pb-3">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                <CardContent className="px-3 pb-2">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
                     <div className="space-y-0.5">
-                      <div className="flex items-center gap-1.5 text-muted-foreground text-xs sm:text-sm">
-                        <Archive className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <div className="flex items-center gap-1 text-muted-foreground text-[11px]">
+                        <Archive className="h-3 w-3" />
                         <span className="hidden sm:inline">Total Snapshots</span>
                         <span className="sm:hidden">Total</span>
                       </div>
-                      <div className="text-xl sm:text-2xl font-bold">{stats.total}</div>
+                      <div className="text-lg sm:text-xl font-bold">{stats.total}</div>
                     </div>
 
                     <div className="space-y-0.5">
-                      <div className="flex items-center gap-1.5 text-muted-foreground text-xs sm:text-sm">
-                        <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <div className="flex items-center gap-1 text-muted-foreground text-[11px]">
+                        <CheckCircle2 className="h-3 w-3" />
                         <span className="hidden sm:inline">Success Rate</span>
                         <span className="sm:hidden">Success</span>
                       </div>
-                      <div className="text-xl sm:text-2xl font-bold">
+                      <div className="text-lg sm:text-xl font-bold">
                         {Math.round(((stats.statusCounts["200"] || 0) / stats.total) * 100)}%
                       </div>
                     </div>
 
                     <div className="space-y-0.5">
-                      <div className="flex items-center gap-1.5 text-muted-foreground text-xs sm:text-sm">
-                        <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <div className="flex items-center gap-1 text-muted-foreground text-[11px]">
+                        <FileText className="h-3 w-3" />
                         <span className="hidden sm:inline">Avg Size</span>
                         <span className="sm:hidden">Size</span>
                       </div>
-                      <div className="text-xl sm:text-2xl font-bold">{formatBytes(stats.avgSize)}</div>
+                      <div className="text-lg sm:text-xl font-bold">{formatBytes(stats.avgSize)}</div>
                     </div>
 
                     <div className="space-y-0.5">
-                      <div className="flex items-center gap-1.5 text-muted-foreground text-xs sm:text-sm">
-                        <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <div className="flex items-center gap-1 text-muted-foreground text-[11px]">
+                        <TrendingUp className="h-3 w-3" />
                         <span className="hidden sm:inline">Date Range</span>
                         <span className="sm:hidden">Range</span>
                       </div>
-                      <div className="text-xs sm:text-sm font-medium break-words">
+                      <div className="text-[11px] font-medium break-words">
                         <span className="hidden lg:inline">
                           {formatDateOnly(stats.firstSnapshot)} - {formatDateOnly(stats.lastSnapshot)}
                         </span>
@@ -549,16 +529,16 @@ export default function WaybackSearch() {
                     </div>
                   </div>
 
-                  <div className="mt-3 pt-3 border-t border-border/50">
-                    <div className="grid md:grid-cols-2 gap-3">
+                  <div className="mt-2 pt-2 border-t border-border/50">
+                    <div className="grid md:grid-cols-2 gap-2">
                       <div>
-                        <div className="text-xs sm:text-sm font-medium mb-1.5">Status Codes</div>
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="text-[11px] font-medium mb-1">Status Codes</div>
+                        <div className="flex flex-wrap gap-1">
                           {Object.entries(stats.statusCounts)
                             .sort(([, a], [, b]) => b - a)
                             .slice(0, 5)
                             .map(([status, count]) => (
-                              <Badge key={status} variant="outline" className="text-xs">
+                              <Badge key={status} variant="outline" className="text-[10px] h-4 px-1.5">
                                 {status}: {count}
                               </Badge>
                             ))}
@@ -566,13 +546,13 @@ export default function WaybackSearch() {
                       </div>
 
                       <div>
-                        <div className="text-xs sm:text-sm font-medium mb-1.5">Content Types</div>
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="text-[11px] font-medium mb-1">Content Types</div>
+                        <div className="flex flex-wrap gap-1">
                           {Object.entries(stats.mimeTypeCounts)
                             .sort(([, a], [, b]) => b - a)
                             .slice(0, 3)
                             .map(([mime, count]) => (
-                              <Badge key={mime} variant="secondary" className="text-xs">
+                              <Badge key={mime} variant="secondary" className="text-[10px] h-4 px-1.5">
                                 {mime}: {count}
                               </Badge>
                             ))}
@@ -585,36 +565,36 @@ export default function WaybackSearch() {
             )}
 
             {/* Filter & Sort Results */}
-            <Card className="mb-4">
-              <CardHeader className="pb-2 pt-3 px-4">
-                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
+            <Card className="mb-3">
+              <CardHeader className="pb-1.5 pt-2 px-3">
+                <CardTitle className="text-sm flex items-center gap-1.5">
+                  <Filter className="h-3.5 w-3.5" />
                   Filter & Sort
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 px-4 pb-3">
+              <CardContent className="space-y-2 px-3 pb-2">
                 {/* Search filter */}
                 <div className="flex gap-2">
                   <Input
                     placeholder="Filter by URL or timestamp..."
                     value={filterText}
                     onChange={(e) => setFilterText(e.target.value)}
-                    className="flex-1"
+                    className="flex-1 h-8 text-sm"
                   />
                   {filterText && (
-                    <Button variant="ghost" onClick={() => setFilterText("")}>
+                    <Button variant="ghost" size="sm" onClick={() => setFilterText("")} className="h-8 text-xs">
                       Clear
                     </Button>
                   )}
                 </div>
 
                 {/* Status and MIME type filters */}
-                <div className="space-y-2">
-                  <div className="flex flex-wrap gap-2 items-center">
-                    <span className="text-sm text-muted-foreground">Status:</span>
+                <div className="space-y-1.5">
+                  <div className="flex flex-wrap gap-1.5 items-center">
+                    <span className="text-xs text-muted-foreground">Status:</span>
                     <Badge
                       variant={filterStatus === "" ? "default" : "secondary"}
-                      className="cursor-pointer"
+                      className="cursor-pointer text-xs h-5"
                       onClick={() => setFilterStatus("")}
                     >
                       All
@@ -623,7 +603,7 @@ export default function WaybackSearch() {
                       <Badge
                         key={status}
                         variant={filterStatus === status ? "default" : "secondary"}
-                        className="cursor-pointer"
+                        className="cursor-pointer text-xs h-5"
                         onClick={() => setFilterStatus(status)}
                       >
                         {status}
@@ -631,11 +611,11 @@ export default function WaybackSearch() {
                     ))}
                   </div>
 
-                  <div className="flex flex-wrap gap-2 items-center">
-                    <span className="text-sm text-muted-foreground">Type:</span>
+                  <div className="flex flex-wrap gap-1.5 items-center">
+                    <span className="text-xs text-muted-foreground">Type:</span>
                     <Badge
                       variant={filterMimeType === "" ? "default" : "secondary"}
-                      className="cursor-pointer"
+                      className="cursor-pointer text-xs h-5"
                       onClick={() => setFilterMimeType("")}
                     >
                       All
@@ -644,7 +624,7 @@ export default function WaybackSearch() {
                       <Badge
                         key={mime}
                         variant={filterMimeType === mime ? "default" : "secondary"}
-                        className="cursor-pointer"
+                        className="cursor-pointer text-xs h-5"
                         onClick={() => setFilterMimeType(mime)}
                       >
                         {mime}
@@ -654,16 +634,16 @@ export default function WaybackSearch() {
                 </div>
 
                 {/* Sort order */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Sort:</span>
-                  <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5">
+                  <span className="text-xs text-muted-foreground">Sort:</span>
+                  <div className="flex gap-1.5">
                     <Button
                       variant={sortOrder === "newest" ? "default" : "secondary"}
                       size="sm"
                       onClick={() => setSortOrder("newest")}
-                      className="flex-1 sm:flex-none"
+                      className="flex-1 sm:flex-none h-7 text-xs"
                     >
-                      <ArrowUpDown className="h-4 w-4 mr-2" />
+                      <ArrowUpDown className="h-3 w-3 mr-1.5" />
                       <span className="hidden sm:inline">Newest First</span>
                       <span className="sm:hidden">Newest</span>
                     </Button>
@@ -671,9 +651,9 @@ export default function WaybackSearch() {
                       variant={sortOrder === "oldest" ? "default" : "secondary"}
                       size="sm"
                       onClick={() => setSortOrder("oldest")}
-                      className="flex-1 sm:flex-none"
+                      className="flex-1 sm:flex-none h-7 text-xs"
                     >
-                      <ArrowUpDown className="h-4 w-4 mr-2" />
+                      <ArrowUpDown className="h-3 w-3 mr-1.5" />
                       <span className="hidden sm:inline">Oldest First</span>
                       <span className="sm:hidden">Oldest</span>
                     </Button>
@@ -695,10 +675,10 @@ export default function WaybackSearch() {
 
         {/* Empty State */}
         {!isLoading && results.length === 0 && activeSearchUrl && (
-          <div className="text-center py-12">
-            <Archive className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No archives found</h3>
-            <p className="text-muted-foreground">Try searching for a different URL or check your spelling</p>
+          <div className="text-center py-8">
+            <Archive className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+            <h3 className="text-lg font-semibold mb-1">No archives found</h3>
+            <p className="text-muted-foreground text-sm">Try searching for a different URL or check your spelling</p>
           </div>
         )}
 
@@ -720,38 +700,38 @@ export default function WaybackSearch() {
 
         {/* Features Grid */}
         {results.length === 0 && !activeSearchUrl && !isLoading && (
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-16">
+          <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto mt-8">
             <Card>
-              <CardHeader>
-                <Search className="h-8 w-8 text-primary mb-2" />
-                <CardTitle>Smart Search</CardTitle>
+              <CardHeader className="pb-2 pt-3 px-4">
+                <Search className="h-6 w-6 text-primary mb-1.5" />
+                <CardTitle className="text-base">Smart Search</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
+              <CardContent className="px-4 pb-3">
+                <p className="text-muted-foreground text-sm">
                   Intelligent search through billions of archived web pages with advanced filtering options.
                 </p>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader>
-                <Clock className="h-8 w-8 text-primary mb-2" />
-                <CardTitle>Time Travel</CardTitle>
+              <CardHeader className="pb-2 pt-3 px-4">
+                <Clock className="h-6 w-6 text-primary mb-1.5" />
+                <CardTitle className="text-base">Time Travel</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
+              <CardContent className="px-4 pb-3">
+                <p className="text-muted-foreground text-sm">
                   Navigate through different time periods to see how websites evolved over the years.
                 </p>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader>
-                <Archive className="h-8 w-8 text-primary mb-2" />
-                <CardTitle>Preserved History</CardTitle>
+              <CardHeader className="pb-2 pt-3 px-4">
+                <Archive className="h-6 w-6 text-primary mb-1.5" />
+                <CardTitle className="text-base">Preserved History</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
+              <CardContent className="px-4 pb-3">
+                <p className="text-muted-foreground text-sm">
                   Access preserved versions of websites that may no longer exist or have changed significantly.
                 </p>
               </CardContent>
@@ -806,11 +786,11 @@ export default function WaybackSearch() {
       </Dialog>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 mt-20">
-        <div className="container mx-auto px-4 py-8">
+      <footer className="border-t border-border/50 mt-12">
+        <div className="container mx-auto px-4 py-4">
           <div className="text-center text-muted-foreground">
-            <p>Powered by Internet Archive's Wayback Machine</p>
-            <p className="text-sm mt-2">Preserving digital history for future generations</p>
+            <p className="text-sm">Powered by Internet Archive's Wayback Machine</p>
+            <p className="text-xs mt-1">Preserving digital history for future generations</p>
           </div>
         </div>
       </footer>

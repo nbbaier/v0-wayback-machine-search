@@ -56,28 +56,28 @@ View comprehensive analytics for each search:
 ### Installation
 
 1. Clone the repository:
-```bash
+\`\`\`bash
 git clone https://github.com/nbbaier/v0-wayback-machine-search.git
 cd v0-wayback-machine-search
-```
+\`\`\`
 
 2. Install dependencies:
-```bash
+\`\`\`bash
 npm install
 # or
 pnpm install
 # or
 yarn install
-```
+\`\`\`
 
 3. Run the development server:
-```bash
+\`\`\`bash
 npm run dev
 # or
 pnpm dev
 # or
 yarn dev
-```
+\`\`\`
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
@@ -105,7 +105,7 @@ yarn dev
 
 ## Project Structure
 
-```
+\`\`\`
 v0-wayback-machine-search/
 ├── app/
 │   ├── api/wayback/      # API route (proxies Wayback CDX API)
@@ -124,7 +124,7 @@ v0-wayback-machine-search/
 │       └── formatters.ts        # Date and byte formatters
 ├── styles/               # Global styles
 └── public/              # Static assets
-```
+\`\`\`
 
 ## How It Works
 

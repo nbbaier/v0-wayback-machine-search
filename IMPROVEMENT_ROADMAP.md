@@ -16,14 +16,14 @@ This document outlines potential enhancements to improve the TimeVault applicati
 
 Add search parameters to the URL for bookmarking and sharing specific searches.
 
-```typescript
+\`\`\`typescript
 // Example: /?url=example.com&from=2020&to=2024
 // Benefits:
 // - Users can bookmark specific searches
 // - Share exact searches with others
 // - Better SEO and discovery
 // - Browser back/forward navigation works correctly
-```
+\`\`\`
 
 **Implementation:**
 - Use Next.js router to sync URL params with search state
@@ -43,7 +43,7 @@ Allow users to export search results to CSV or JSON.
 - Useful for researchers and data analysis
 
 **Implementation:**
-```typescript
+\`\`\`typescript
 const exportToCSV = (snapshots: ArchiveResult[]) => {
   const csv = [
     ['Timestamp', 'URL', 'Status', 'MIME Type', 'Size'],
@@ -58,7 +58,7 @@ const exportToCSV = (snapshots: ArchiveResult[]) => {
   a.download = `wayback-export-${Date.now()}.csv`
   a.click()
 }
-```
+\`\`\`
 
 ### 3. Code Refactoring
 **Effort:** Medium | **Impact:** High (Maintainability)
@@ -66,7 +66,7 @@ const exportToCSV = (snapshots: ArchiveResult[]) => {
 Extract additional business logic and create more custom hooks.
 
 **Suggested structure:**
-```
+\`\`\`
 lib/
   hooks/
     useWaybackSearch.ts ✅ (Done)
@@ -79,7 +79,7 @@ lib/
     grouping.ts (groupSnapshotsByDate)
     types.ts (TypeScript interfaces)
     filters.ts (Filter logic)
-```
+\`\`\`
 
 ### 4. Advanced Keyboard Shortcuts
 **Effort:** Low | **Impact:** Medium
@@ -171,7 +171,7 @@ Improve TypeScript usage across the codebase.
 - Add proper error types
 - Type guards for data validation
 
-```typescript
+\`\`\`typescript
 // Example with Zod
 import { z } from 'zod'
 
@@ -187,7 +187,7 @@ const WaybackResponseSchema = z.array(
 
 // Runtime validation
 const data = WaybackResponseSchema.parse(response)
-```
+\`\`\`
 
 ### 11. Comprehensive Testing
 **Effort:** High | **Impact:** High (Stability)
@@ -275,7 +275,7 @@ Track popular searches and usage patterns.
 Protect API endpoint from abuse.
 
 **Implementation:**
-```typescript
+\`\`\`typescript
 import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
 
@@ -289,7 +289,7 @@ const { success } = await ratelimit.limit(ip)
 if (!success) {
   return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
 }
-```
+\`\`\`
 
 ### 18. Database Integration
 **Effort:** High | **Impact:** High (Features)

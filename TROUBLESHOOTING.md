@@ -26,7 +26,7 @@ Common issues and solutions for TimeVault.
 **Solutions:**
 
 **Try different URL variations:**
-```
+\`\`\`
 # If searching for:
 www.example.com
 
@@ -34,7 +34,7 @@ www.example.com
 example.com
 http://example.com
 https://example.com
-```
+\`\`\`
 
 **Check the Wayback Machine directly:**
 1. Visit [web.archive.org](https://web.archive.org/)
@@ -46,7 +46,7 @@ https://example.com
 - Try searching without date restrictions first
 
 **Try a more general URL:**
-```
+\`\`\`
 # Instead of:
 https://example.com/blog/2020/post-title
 
@@ -54,7 +54,7 @@ https://example.com/blog/2020/post-title
 https://example.com/blog
 # Or even:
 example.com
-```
+\`\`\`
 
 ### Search Taking Too Long
 
@@ -73,10 +73,10 @@ example.com
 - This speeds up both API response and rendering
 
 **Check your internet connection:**
-```bash
+\`\`\`bash
 # Test connectivity to Internet Archive
 ping web.archive.org
-```
+\`\`\`
 
 **Wait for cache to warm up:**
 - First search may be slow (cold start)
@@ -109,13 +109,13 @@ ping web.archive.org
 - Try different years
 
 **Try the domain root:**
-```
+\`\`\`
 # Instead of specific page:
 example.com/missing-page
 
 # Try:
 example.com
-```
+\`\`\`
 
 ## Performance Issues
 
@@ -162,11 +162,11 @@ example.com
 4. Report these in a GitHub issue
 
 **Clear browser cache:**
-```
+\`\`\`
 Chrome: Ctrl+Shift+Del → Clear browsing data
 Firefox: Ctrl+Shift+Del → Clear data
 Safari: Cmd+Option+E
-```
+\`\`\`
 
 **Reduce result size:**
 - If you have 10,000+ results, filtering may slow down
@@ -223,11 +223,11 @@ Safari: Cmd+Option+E
 - **Linux:** Depends on desktop environment
 
 **Clear localStorage:**
-```javascript
+\`\`\`javascript
 // Open browser console (F12) and run:
 localStorage.removeItem('theme')
 // Then refresh the page
-```
+\`\`\`
 
 **Try a different browser:**
 - Issue may be browser-specific
@@ -328,11 +328,11 @@ localStorage.removeItem('theme')
 - On Vercel, wait for serverless function to restart
 
 **Clear browser cache:**
-```
+\`\`\`
 Chrome: Ctrl+Shift+Del
 Firefox: Ctrl+Shift+Del
 Safari: Cmd+Option+E
-```
+\`\`\`
 
 **Use different year filter:**
 - Different filters = different cache key
@@ -445,25 +445,25 @@ Safari: Cmd+Option+E
 **Solutions:**
 
 **Check Node.js version:**
-```bash
+\`\`\`bash
 node --version
 # Should be 18.x or higher
-```
+\`\`\`
 
 **Update npm:**
-```bash
+\`\`\`bash
 npm install -g npm@latest
-```
+\`\`\`
 
 **Clear npm cache:**
-```bash
+\`\`\`bash
 npm cache clean --force
 rm -rf node_modules package-lock.json
 npm install
-```
+\`\`\`
 
 **Try different package manager:**
-```bash
+\`\`\`bash
 # Try pnpm
 npm install -g pnpm
 pnpm install
@@ -471,7 +471,7 @@ pnpm install
 # Or yarn
 npm install -g yarn
 yarn install
-```
+\`\`\`
 
 ### Build Fails
 
@@ -480,10 +480,10 @@ yarn install
 **Solutions:**
 
 **Check for TypeScript errors:**
-```bash
+\`\`\`bash
 npm run build
 # Read error messages carefully
-```
+\`\`\`
 
 **Common TypeScript issues:**
 - Missing type definitions
@@ -491,10 +491,10 @@ npm run build
 - Type mismatches
 
 **Clean build:**
-```bash
+\`\`\`bash
 rm -rf .next
 npm run build
-```
+\`\`\`
 
 **Check environment:**
 - Ensure Node.js 18+
@@ -508,7 +508,7 @@ npm run build
 **Solutions:**
 
 **Check port 3000:**
-```bash
+\`\`\`bash
 # Kill process using port 3000
 # macOS/Linux:
 lsof -ti:3000 | xargs kill -9
@@ -516,12 +516,12 @@ lsof -ti:3000 | xargs kill -9
 # Windows:
 netstat -ano | findstr :3000
 taskkill /PID <PID> /F
-```
+\`\`\`
 
 **Use different port:**
-```bash
+\`\`\`bash
 PORT=3001 npm run dev
-```
+\`\`\`
 
 **Check for errors:**
 - Read console output carefully
@@ -542,9 +542,9 @@ PORT=3001 npm run dev
 - Ensure "strict": true is set correctly
 
 **Install types:**
-```bash
+\`\`\`bash
 npm install --save-dev @types/react @types/node
-```
+\`\`\`
 
 **Verify imports:**
 - Use `@/` for absolute imports
@@ -578,20 +578,20 @@ npm install --save-dev @types/react @types/node
 - If down, wait for Internet Archive to fix
 
 **Check network:**
-```bash
+\`\`\`bash
 ping web.archive.org
-```
+\`\`\`
 
 **Wait and retry:**
 - Temporary issues usually resolve in minutes
 - Try again in 5-10 minutes
 
 **Check server logs (if self-hosting):**
-```bash
+\`\`\`bash
 # Look for error details
 npm run dev
 # Check console output
-```
+\`\`\`
 
 ### Rate Limiting
 
