@@ -19,7 +19,7 @@ import {
   TrendingUp,
   FileText,
   CheckCircle2,
-  ScaleIcon as Skeleton,
+  Loader2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -461,35 +461,16 @@ export default function WaybackSearch() {
         </Card>
 
         {isLoading && (
-          <div className="max-w-4xl mx-auto space-y-4">
-            <Skeleton className="h-8 w-64" />
+          <div className="max-w-4xl mx-auto py-16">
             <Card>
-              <CardHeader>
-                <Skeleton className="h-6 w-48" />
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="space-y-2">
-                      <Skeleton className="h-4 w-24" />
-                      <Skeleton className="h-8 w-16" />
-                    </div>
-                  ))}
-                </div>
+              <CardContent className="flex flex-col items-center justify-center py-16">
+                <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Searching archives...</h3>
+                <p className="text-muted-foreground text-center">
+                  Querying the Wayback Machine for snapshots
+                </p>
               </CardContent>
             </Card>
-            {[1, 2, 3].map((i) => (
-              <Card key={i}>
-                <CardHeader>
-                  <Skeleton className="h-6 w-48" />
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {[1, 2].map((j) => (
-                    <Skeleton key={j} className="h-20 w-full" />
-                  ))}
-                </CardContent>
-              </Card>
-            ))}
           </div>
         )}
 
