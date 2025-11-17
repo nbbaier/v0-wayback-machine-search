@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
-import { Home, ArrowUpDown, ExternalLink, Search } from 'lucide-react'
+import { Home, ArrowUpDown, ExternalLink, Search, Table2 } from 'lucide-react'
 import { useWaybackSearch } from "@/lib/hooks/useWaybackSearch"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -93,18 +93,27 @@ export default function TableSearch() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50 dark:from-gray-900 dark:via-yellow-900/20 dark:to-gray-900">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
+      <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h1 className="text-xl font-bold">TimeVault - Table View</h1>
-              <p className="text-xs text-gray-600 dark:text-gray-400">Spreadsheet-style archive browser</p>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg">
+                  <Table2 className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                    TimeVault Table
+                  </h1>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Spreadsheet-style archive browser</p>
+                </div>
+              </div>
             </div>
             <Link
               href="/"
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 flex items-center gap-2"
+              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 flex items-center gap-2 transition-colors"
             >
               <Home className="h-4 w-4" />
               Home
@@ -119,7 +128,7 @@ export default function TableSearch() {
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="flex-1"
             />
-            <Button onClick={handleSearch} disabled={isLoading}>
+            <Button onClick={handleSearch} disabled={isLoading} className="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700">
               <Search className="h-4 w-4 mr-2" />
               {isLoading ? 'Searching...' : 'Search'}
             </Button>
@@ -130,7 +139,7 @@ export default function TableSearch() {
       <div className="max-w-7xl mx-auto px-4 py-4">
         {/* Filter and Stats */}
         {results.length > 0 && (
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-3 mb-4">
+          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-4 shadow-lg shadow-yellow-500/10">
             <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between">
               <div className="flex items-center gap-4">
                 <span className="text-sm font-medium">
@@ -154,8 +163,14 @@ export default function TableSearch() {
 
         {/* Table */}
         {isLoading && (
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-8 text-center">
-            <p className="text-gray-600 dark:text-gray-400">Loading snapshots...</p>
+          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-yellow-200 dark:border-yellow-800 rounded-lg p-8 text-center shadow-lg shadow-yellow-500/10">
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-600 to-orange-600 rounded-full blur-xl opacity-50 animate-pulse" />
+                <Search className="h-12 w-12 text-yellow-600 dark:text-yellow-400 animate-pulse relative" />
+              </div>
+              <p className="text-gray-600 dark:text-gray-400 font-medium">Loading snapshots...</p>
+            </div>
           </div>
         )}
 
@@ -167,16 +182,16 @@ export default function TableSearch() {
         )}
 
         {!isLoading && results.length === 0 && activeSearchUrl && (
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-8 text-center">
+          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-gray-200 dark:border-gray-800 rounded-lg p-8 text-center">
             <p className="text-gray-600 dark:text-gray-400">No archives found</p>
           </div>
         )}
 
         {sortedAndFilteredResults.length > 0 && !isLoading && (
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
+          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-yellow-200 dark:border-yellow-800 rounded-lg overflow-hidden shadow-xl shadow-yellow-500/20">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <thead className="bg-gradient-to-r from-yellow-100 via-orange-100 to-yellow-100 dark:from-yellow-950/30 dark:via-orange-950/30 dark:to-yellow-950/30 border-b border-yellow-200 dark:border-yellow-700">
                   <tr>
                     <th className="px-4 py-3 text-left font-medium">#</th>
                     <th
@@ -226,9 +241,9 @@ export default function TableSearch() {
                     <th className="px-4 py-3 text-left font-medium">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                <tbody className="divide-y divide-yellow-200/50 dark:divide-yellow-800/50">
                   {sortedAndFilteredResults.map((result, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                    <tr key={idx} className="hover:bg-gradient-to-r hover:from-yellow-50/50 hover:to-orange-50/50 dark:hover:from-yellow-950/20 dark:hover:to-orange-950/20 transition-colors">
                       <td className="px-4 py-2 text-gray-500 dark:text-gray-400 font-mono text-xs">
                         {idx + 1}
                       </td>
@@ -275,8 +290,11 @@ export default function TableSearch() {
 
         {/* Empty State */}
         {!activeSearchUrl && !isLoading && (
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-12 text-center">
-            <p className="text-gray-600 dark:text-gray-400 mb-2">Enter a URL to start searching</p>
+          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-yellow-200 dark:border-yellow-800 rounded-lg p-12 text-center shadow-lg shadow-yellow-500/10">
+            <div className="inline-block p-4 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl mb-4">
+              <Table2 className="h-16 w-16 text-white" />
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 mb-2 font-medium">Enter a URL to start searching</p>
             <p className="text-xs text-gray-500 dark:text-gray-500">
               Results will appear in a sortable table format
             </p>

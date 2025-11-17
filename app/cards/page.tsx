@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
-import { Home, Calendar, ExternalLink, Clock } from 'lucide-react'
+import { Home, Calendar, ExternalLink, Clock, LayoutGrid } from 'lucide-react'
 import { useWaybackSearch } from "@/lib/hooks/useWaybackSearch"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -106,18 +106,27 @@ export default function CardsSearch() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
+      <div className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold">TimeVault - Card View</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Snapshots grouped by date</p>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary rounded-lg">
+                  <LayoutGrid className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    TimeVault Cards
+                  </h1>
+                  <p className="text-sm text-muted-foreground">Snapshots grouped by date</p>
+                </div>
+              </div>
             </div>
             <Link
               href="/"
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 flex items-center gap-2"
+              className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors"
             >
               <Home className="h-4 w-4" />
               Home
@@ -133,7 +142,7 @@ export default function CardsSearch() {
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 className="flex-1"
               />
-              <Button onClick={handleSearch} disabled={isLoading}>
+              <Button onClick={handleSearch} disabled={isLoading} className="bg-primary hover:opacity-90">
                 {isLoading ? 'Searching...' : 'Search'}
               </Button>
             </div>
@@ -150,45 +159,44 @@ export default function CardsSearch() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="max-w-6xl mx-auto px-4 pt-0 pb-3">
         {/* Loading State */}
         {isLoading && (
-          <Card className="p-12 text-center">
+          <Card className="p-12 text-center bg-card/50 backdrop-blur-sm border-primary/20">
             <div className="flex flex-col items-center gap-4">
-              <Clock className="h-12 w-12 text-blue-600 animate-spin" />
-              <p className="text-gray-600 dark:text-gray-400">Loading snapshots...</p>
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary rounded-full blur-xl opacity-50 animate-pulse" />
+                <Clock className="h-12 w-12 text-primary animate-spin relative" />
+              </div>
+              <p className="text-muted-foreground font-medium">Loading snapshots...</p>
             </div>
           </Card>
         )}
 
         {/* Error State */}
         {isError && (
-          <Card className="p-12 text-center border-red-300 dark:border-red-800">
-            <p className="text-red-600 dark:text-red-400 font-medium">Failed to load snapshots</p>
+          <Card className="p-12 text-center border-destructive/50">
+            <p className="text-destructive font-medium">Failed to load snapshots</p>
           </Card>
         )}
 
         {/* Empty State */}
         {!activeSearchUrl && !isLoading && (
-          <Card className="p-12 text-center">
-            <Calendar className="h-16 w-16 text-blue-600 mx-auto mb-4" />
-            <h3 className="text-xl font-bold mb-2">Search the Archive</h3>
-            <p className="text-gray-600 dark:text-gray-400">
+          <Card className="p-12 text-center bg-card/50 backdrop-blur-sm border-primary/20">
+            <div className="inline-block p-4 bg-primary rounded-2xl mb-4">
+              <Calendar className="h-16 w-16 text-primary-foreground" />
+            </div>
+            <h3 className="text-xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Search the Archive</h3>
+            <p className="text-muted-foreground">
               Enter a URL to see snapshots grouped by date
             </p>
-          </Card>
-        )}
-
-        {!isLoading && results.length === 0 && activeSearchUrl && (
-          <Card className="p-12 text-center">
-            <p className="text-gray-600 dark:text-gray-400">No snapshots found</p>
           </Card>
         )}
 
         {/* Results Summary */}
         {groupedByDate.length > 0 && !isLoading && (
           <div className="mb-6">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-muted-foreground">
               Found {groupedByDate.reduce((acc, g) => acc + g.snapshots.length, 0)} snapshots across {groupedByDate.length} days
               {filter && ' (filtered)'}
             </p>
@@ -198,57 +206,88 @@ export default function CardsSearch() {
         {/* Date Cards */}
         <div className="space-y-4">
           {groupedByDate.map((group) => (
-            <Card key={group.date} className="overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-b border-gray-200 dark:border-gray-800">
+            <Card key={group.date} className="overflow-hidden bg-card/80 backdrop-blur-sm border-primary/20 hover:shadow-2xl hover:shadow-primary/20 transition-all duration-300 hover:-translate-y-1">
+              <CardHeader className="bg-muted/50 border-b border-border">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    {formatDate(group.date)}
+                    <Calendar className="h-5 w-5 text-primary" />
+                    <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                      {formatDate(group.date)}
+                    </span>
                   </CardTitle>
-                  <Badge variant="secondary">
+                  <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
                     {group.snapshots.length} snapshot{group.snapshots.length !== 1 ? 's' : ''}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="divide-y divide-gray-200 dark:divide-gray-800">
-                  {group.snapshots.map((snapshot, idx) => (
-                    <a
-                      key={idx}
-                      href={`https://web.archive.org/web/${snapshot.timestamp}/${snapshot.url}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="text-sm font-mono font-medium text-gray-900 dark:text-gray-100">
+                <div className="divide-y divide-border">
+                  {group.snapshots.map((snapshot, idx) => {
+                    const statusColor = snapshot.status.startsWith('2') 
+                      ? 'bg-chart-2/10 text-chart-2 border-chart-2/30'
+                      : snapshot.status.startsWith('3')
+                      ? 'bg-chart-3/10 text-chart-3 border-chart-3/30'
+                      : 'bg-destructive/10 text-destructive border-destructive/30'
+
+                    return (
+                      <div
+                        key={idx}
+                        className="relative p-3 hover:bg-muted/30 transition-all duration-300 group"
+                      >
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-[auto_1fr_auto] gap-3 items-start">
+                          <div className="flex items-center gap-2">
+                            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                              <Clock className="h-4 w-4 text-primary" />
+                            </div>
+                            <span className="text-lg font-mono font-bold text-foreground">
                               {formatTime(snapshot.timestamp)}
                             </span>
-                            <Badge
-                              variant={snapshot.status === '200' ? 'default' : 'secondary'}
-                              className="text-xs"
-                            >
-                              {snapshot.status}
-                            </Badge>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                              {snapshot.mimetype}
-                            </span>
-                            {snapshot.length && (
-                              <span className="text-xs text-gray-500 dark:text-gray-400">
-                                {formatBytes(snapshot.length)}
-                              </span>
-                            )}
                           </div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 truncate group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors">
-                            {snapshot.url}
-                          </p>
+
+                          <div className="space-y-2">
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <Badge className={`text-xs font-medium border ${statusColor}`}>
+                                {snapshot.status}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs bg-muted/50">
+                                {snapshot.mimetype}
+                              </Badge>
+                              {snapshot.length && (
+                                <Badge variant="outline" className="text-xs bg-muted/50">
+                                  {formatBytes(snapshot.length)}
+                                </Badge>
+                              )}
+                            </div>
+                            
+                            <div className="flex items-start gap-2">
+                              <ExternalLink className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                              <p className="text-sm text-muted-foreground break-all group-hover:text-primary transition-colors">
+                                {snapshot.url}
+                              </p>
+                            </div>
+                          </div>
+
+                          <a
+                            href={`https://web.archive.org/web/${snapshot.timestamp}/${snapshot.url}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="shrink-0"
+                          >
+                            <Button 
+                              size="sm" 
+                              className="bg-primary hover:opacity-90 text-primary-foreground shadow-md hover:shadow-lg hover:scale-105 transition-all"
+                            >
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              Open Archive
+                            </Button>
+                          </a>
                         </div>
-                        <ExternalLink className="h-4 w-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 shrink-0 transition-colors" />
                       </div>
-                    </a>
-                  ))}
+                    )
+                  })}
                 </div>
               </CardContent>
             </Card>

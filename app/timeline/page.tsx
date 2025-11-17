@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
-import { Home, Calendar, ExternalLink, Image, FileText, Clock } from 'lucide-react'
+import { Home, Calendar, ExternalLink, Image, FileText, Clock, Sparkles } from 'lucide-react'
 import { useWaybackSearch } from "@/lib/hooks/useWaybackSearch"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -100,20 +100,27 @@ export default function TimelineSearch() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-fuchsia-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
       {/* Header */}
-      <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
+      <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                TimeVault Timeline
-              </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Visual journey through time</p>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-purple-500 via-fuchsia-600 to-pink-600 rounded-lg">
+                  <Sparkles className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 bg-clip-text text-transparent">
+                    TimeVault Timeline
+                  </h1>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Visual journey through time</p>
+                </div>
+              </div>
             </div>
             <Link
               href="/"
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 flex items-center gap-2"
+              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 flex items-center gap-2 transition-colors"
             >
               <Home className="h-4 w-4" />
               Home
@@ -128,7 +135,7 @@ export default function TimelineSearch() {
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="flex-1"
             />
-            <Button onClick={handleSearch} disabled={isLoading}>
+            <Button onClick={handleSearch} disabled={isLoading} className="bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 hover:from-purple-700 hover:via-fuchsia-700 hover:to-pink-700">
               {isLoading ? 'Searching...' : 'Explore'}
             </Button>
           </div>
@@ -162,10 +169,13 @@ export default function TimelineSearch() {
 
         {/* Loading State */}
         {isLoading && (
-          <Card className="p-12 text-center">
+          <Card className="p-12 text-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-purple-200 dark:border-purple-800">
             <div className="flex flex-col items-center gap-4">
-              <Clock className="h-12 w-12 text-purple-600 animate-spin" />
-              <p className="text-gray-600 dark:text-gray-400">Traveling through time...</p>
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 rounded-full blur-xl opacity-50 animate-pulse" />
+                <Clock className="h-12 w-12 text-purple-600 dark:text-purple-400 animate-spin relative" />
+              </div>
+              <p className="text-gray-600 dark:text-gray-400 font-medium">Traveling through time...</p>
             </div>
           </Card>
         )}
@@ -179,9 +189,11 @@ export default function TimelineSearch() {
 
         {/* Empty State */}
         {!activeSearchUrl && !isLoading && (
-          <Card className="p-12 text-center">
-            <Calendar className="h-16 w-16 text-purple-600 mx-auto mb-4" />
-            <h3 className="text-xl font-bold mb-2">Start Your Journey</h3>
+          <Card className="p-12 text-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-purple-200 dark:border-purple-800">
+            <div className="inline-block p-4 bg-gradient-to-br from-purple-500 via-fuchsia-600 to-pink-600 rounded-2xl mb-4">
+              <Calendar className="h-16 w-16 text-white" />
+            </div>
+            <h3 className="text-xl font-bold mb-2 bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 bg-clip-text text-transparent">Start Your Journey</h3>
             <p className="text-gray-600 dark:text-gray-400">
               Enter a URL to visualize its history on the timeline
             </p>
@@ -198,13 +210,13 @@ export default function TimelineSearch() {
         {groupedByYearMonth.length > 0 && !isLoading && (
           <div className="relative">
             {/* Vertical Line */}
-            <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-400 via-blue-400 to-pink-400" />
+            <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-400 via-fuchsia-400 to-pink-400" />
 
             <div className="space-y-8">
               {groupedByYearMonth.map((group, groupIdx) => (
                 <div key={`${group.year}-${group.month}`} className="relative">
                   {/* Timeline Marker */}
-                  <div className="absolute left-4 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 border-4 border-white dark:border-gray-900 shadow-lg z-10 flex items-center justify-center">
+                  <div className="absolute left-4 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-purple-500 via-fuchsia-600 to-pink-600 border-4 border-white dark:border-gray-900 shadow-lg shadow-purple-500/50 z-10 flex items-center justify-center">
                     <Calendar className="h-3 w-3 md:h-4 md:w-4 text-white" />
                   </div>
 
@@ -221,7 +233,7 @@ export default function TimelineSearch() {
 
                     <div className="space-y-3">
                       {group.snapshots.map((snapshot, idx) => (
-                        <Card key={idx} className="overflow-hidden hover:shadow-xl transition-shadow">
+                        <Card key={idx} className="overflow-hidden bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-purple-200/50 dark:border-purple-800/50 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:-translate-y-1">
                           <CardContent className="p-4">
                             <div className="flex flex-col sm:flex-row gap-4">
                               {/* Preview */}
