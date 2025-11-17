@@ -394,39 +394,39 @@ export default function WaybackSearch() {
                 />
                 {showHistory && searchHistory.length > 0 && (
                   <Card className="absolute top-full left-0 right-0 mt-2 z-10 shadow-lg">
-                    <CardHeader className="pb-3">
+                    <CardHeader className="pb-2 pt-3 px-3">
                       <div className="flex items-center justify-between gap-2">
-                        <CardTitle className="text-sm flex items-center gap-2">
-                          <History className="h-4 w-4" />
+                        <CardTitle className="text-xs sm:text-sm flex items-center gap-1.5">
+                          <History className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           <span className="hidden sm:inline">Recent Searches</span>
                           <span className="sm:hidden">Recent</span>
                         </CardTitle>
-                        <div className="flex gap-1 sm:gap-2">
-                          <Button variant="ghost" size="sm" onClick={clearHistory} className="text-xs sm:text-sm">
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="sm" onClick={clearHistory} className="text-xs h-7 px-2">
                             <span className="hidden sm:inline">Clear All</span>
                             <span className="sm:hidden">Clear</span>
                           </Button>
-                          <Button variant="ghost" size="sm" onClick={() => setShowHistory(false)}>
-                            <X className="h-4 w-4" />
+                          <Button variant="ghost" size="sm" onClick={() => setShowHistory(false)} className="h-7 w-7 p-0">
+                            <X className="h-3.5 w-3.5" />
                           </Button>
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="space-y-1">
+                    <CardContent className="space-y-0.5 px-3 pb-3">
                       {searchHistory.map((url, index) => (
                         <div
                           key={index}
-                          className="flex items-center justify-between gap-2 p-2 rounded hover:bg-accent cursor-pointer group"
+                          className="flex items-center justify-between gap-2 p-1.5 rounded hover:bg-accent cursor-pointer group"
                           onClick={() => {
                             setSearchUrl(url)
                             setShowHistory(false)
                           }}
                         >
-                          <span className="text-sm truncate flex-1">{url}</span>
+                          <span className="text-xs sm:text-sm truncate flex-1">{url}</span>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
                             onClick={(e) => {
                               e.stopPropagation()
                               removeFromHistory(url)
@@ -494,47 +494,51 @@ export default function WaybackSearch() {
             </div>
 
             {stats && (
-              <Card className="mb-6 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-primary" />
-                    Statistics Overview
+              <Card className="mb-4 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+                <CardHeader className="pb-2 pt-3 px-4">
+                  <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4 text-primary" />
+                    Statistics
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                        <Archive className="h-4 w-4" />
-                        Total Snapshots
+                <CardContent className="px-4 pb-3">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-1.5 text-muted-foreground text-xs sm:text-sm">
+                        <Archive className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <span className="hidden sm:inline">Total Snapshots</span>
+                        <span className="sm:hidden">Total</span>
                       </div>
-                      <div className="text-2xl font-bold">{stats.total}</div>
+                      <div className="text-xl sm:text-2xl font-bold">{stats.total}</div>
                     </div>
 
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                        <CheckCircle2 className="h-4 w-4" />
-                        Success Rate
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-1.5 text-muted-foreground text-xs sm:text-sm">
+                        <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <span className="hidden sm:inline">Success Rate</span>
+                        <span className="sm:hidden">Success</span>
                       </div>
-                      <div className="text-2xl font-bold">
+                      <div className="text-xl sm:text-2xl font-bold">
                         {Math.round(((stats.statusCounts["200"] || 0) / stats.total) * 100)}%
                       </div>
                     </div>
 
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                        <FileText className="h-4 w-4" />
-                        Avg Size
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-1.5 text-muted-foreground text-xs sm:text-sm">
+                        <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <span className="hidden sm:inline">Avg Size</span>
+                        <span className="sm:hidden">Size</span>
                       </div>
-                      <div className="text-2xl font-bold">{formatBytes(stats.avgSize)}</div>
+                      <div className="text-xl sm:text-2xl font-bold">{formatBytes(stats.avgSize)}</div>
                     </div>
 
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                        <TrendingUp className="h-4 w-4" />
-                        Date Range
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-1.5 text-muted-foreground text-xs sm:text-sm">
+                        <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <span className="hidden sm:inline">Date Range</span>
+                        <span className="sm:hidden">Range</span>
                       </div>
-                      <div className="text-sm font-medium break-words">
+                      <div className="text-xs sm:text-sm font-medium break-words">
                         <span className="hidden lg:inline">
                           {formatDateOnly(stats.firstSnapshot)} - {formatDateOnly(stats.lastSnapshot)}
                         </span>
@@ -545,11 +549,11 @@ export default function WaybackSearch() {
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-border/50">
-                    <div className="grid md:grid-cols-2 gap-4">
+                  <div className="mt-3 pt-3 border-t border-border/50">
+                    <div className="grid md:grid-cols-2 gap-3">
                       <div>
-                        <div className="text-sm font-medium mb-2">Status Codes</div>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="text-xs sm:text-sm font-medium mb-1.5">Status Codes</div>
+                        <div className="flex flex-wrap gap-1.5">
                           {Object.entries(stats.statusCounts)
                             .sort(([, a], [, b]) => b - a)
                             .slice(0, 5)
@@ -562,8 +566,8 @@ export default function WaybackSearch() {
                       </div>
 
                       <div>
-                        <div className="text-sm font-medium mb-2">Content Types</div>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="text-xs sm:text-sm font-medium mb-1.5">Content Types</div>
+                        <div className="flex flex-wrap gap-1.5">
                           {Object.entries(stats.mimeTypeCounts)
                             .sort(([, a], [, b]) => b - a)
                             .slice(0, 3)
@@ -581,14 +585,14 @@ export default function WaybackSearch() {
             )}
 
             {/* Filter & Sort Results */}
-            <Card className="mb-6">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
+            <Card className="mb-4">
+              <CardHeader className="pb-2 pt-3 px-4">
+                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                   <Filter className="h-4 w-4" />
-                  Filter & Sort Results
+                  Filter & Sort
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 px-4 pb-3">
                 {/* Search filter */}
                 <div className="flex gap-2">
                   <Input

@@ -56,14 +56,16 @@ interface VirtualizedSnapshotListProps {
 /**
  * Height estimation for group header (date + badge)
  * Used by virtualizer to calculate scroll positions
+ * Increased to account for responsive wrapping on mobile
  */
-const HEADER_HEIGHT = 120
+const HEADER_HEIGHT = 100
 
 /**
  * Height estimation for each snapshot item
  * Includes timestamp, status, mimetype, and action buttons
+ * Increased to account for mobile stacking layout
  */
-const SNAPSHOT_ITEM_HEIGHT = 100
+const SNAPSHOT_ITEM_HEIGHT = 140
 
 /**
  * Virtualized list component for efficiently rendering large numbers of snapshots
@@ -155,24 +157,24 @@ export function VirtualizedSnapshotList({
                 transform: `translateY(${virtualItem.start}px)`,
               }}
             >
-              <Card className="hover:bg-accent/50 transition-colors mb-4">
-                <CardHeader className="pb-3">
+              <Card className="hover:bg-accent/50 transition-colors mb-3">
+                <CardHeader className="pb-2 pt-3 px-4">
                   <div className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-primary" />
-                    <CardTitle className="text-lg">
+                    <Calendar className="h-4 w-4 text-primary shrink-0" />
+                    <CardTitle className="text-base sm:text-lg">
                       {formatDateOnly(group.date + "000000")}
                     </CardTitle>
-                    <Badge variant="secondary" className="ml-auto">
+                    <Badge variant="secondary" className="ml-auto text-xs">
                       {group.snapshots.length}{" "}
                       {group.snapshots.length === 1 ? "snapshot" : "snapshots"}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-2 px-4 pb-3">
                   {group.snapshots.map((snapshot, snapshotIndex) => (
                     <div
                       key={snapshotIndex}
-                      className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 p-3 rounded-lg bg-background/50 border border-border/50"
+                      className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-background/50 border border-border/50"
                     >
                       <div className="flex flex-col gap-2 flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
