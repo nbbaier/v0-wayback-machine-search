@@ -41,6 +41,7 @@ export function ViewSwitcher() {
 					<Link
 						key={view.href}
 						href={href}
+						prefetch={true}
 						className={cn(
 							"flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
 							isActive

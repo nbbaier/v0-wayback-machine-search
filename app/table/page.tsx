@@ -82,7 +82,7 @@ export default function TableSearch() {
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50 dark:from-gray-900 dark:via-yellow-900/20 dark:to-gray-900">
-			<div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
+			<div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-20">
 				<div className="max-w-7xl mx-auto px-4 py-3">
 					<SearchHeader
 						title="TimeVault Table"

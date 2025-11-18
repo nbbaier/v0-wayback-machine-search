@@ -70,7 +70,7 @@ export default function CardsSearch() {
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">
-			<div className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-10">
+			<div className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-20">
 				<div className="max-w-6xl mx-auto px-4 py-4">
 					<SearchHeader
 						title="TimeVault Cards"

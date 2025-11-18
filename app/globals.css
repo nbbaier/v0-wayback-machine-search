@@ -164,3 +164,43 @@
 		transparent 70%
 	);
 }
+
+/* View Transitions API support for smooth page transitions */
+@view-transition {
+	navigation: auto;
+}
+
+/* Customize the transition */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 0.3s;
+	animation-timing-function: ease-in-out;
+}
+
+/* Fade transition for old content */
+::view-transition-old(root) {
+	animation-name: fade-out;
+}
+
+/* Fade transition for new content */
+::view-transition-new(root) {
+	animation-name: fade-in;
+}
+
+@keyframes fade-out {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
