@@ -1,5 +1,5 @@
-import { Home, type LucideIcon } from "lucide-react";
-import Link from "next/link";
+import { type LucideIcon } from "lucide-react";
+import { ViewSwitcher } from "./view-switcher";
 
 interface SearchHeaderProps {
 	title: string;
@@ -33,13 +33,7 @@ export function SearchHeader({
 					</div>
 				</div>
 			</div>
-			<Link
-				href="/"
-				className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors"
-			>
-				<Home className="h-4 w-4" />
-				Home
-			</Link>
+			<ViewSwitcher />
 		</div>
 	);
 }

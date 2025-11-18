@@ -1,7 +1,8 @@
 "use client";
 
 import { Calendar, Sparkles } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { SearchForm } from "@/components/search/search-form";
 import { SearchHeader } from "@/components/search/search-header";
 import {
@@ -16,20 +17,27 @@ import type { GroupedSnapshotByMonth } from "@/lib/types/archive";
 import { cleanUrl } from "@/lib/utils/formatters";
 
 export default function TimelineSearch() {
-	const [searchUrl, setSearchUrl] = useState("");
-	const [activeSearchUrl, setActiveSearchUrl] = useState<string>("");
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const urlParam = searchParams.get("url") || "";
+
+	const [searchUrl, setSearchUrl] = useState(urlParam);
 	const [selectedYear, setSelectedYear] = useState<string>("");
 
-	const searchParams = useMemo(() => {
-		if (!activeSearchUrl) return null;
-		return { url: cleanUrl(activeSearchUrl) };
-	}, [activeSearchUrl]);
+	useEffect(() => {
+		setSearchUrl(urlParam);
+	}, [urlParam]);
 
-	const { data: results, isLoading, isError } = useWaybackSearch(searchParams);
+	const queryParams = useMemo(() => {
+		if (!urlParam) return null;
+		return { url: cleanUrl(urlParam) };
+	}, [urlParam]);
+
+	const { data: results, isLoading, isError } = useWaybackSearch(queryParams);
 
 	const handleSearch = () => {
 		if (!searchUrl.trim()) return;
-		setActiveSearchUrl(searchUrl);
+		router.push(`/timeline?url=${encodeURIComponent(searchUrl)}`);
 	};
 
 	const groupedByYearMonth = useMemo(() => {
@@ -63,7 +71,7 @@ export default function TimelineSearch() {
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-purple-50 via-fuchsia-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
-			<div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
+			<div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-20">
 				<div className="max-w-6xl mx-auto px-4 py-4">
 					<SearchHeader
 						title="TimeVault Timeline"
@@ -126,7 +134,7 @@ export default function TimelineSearch() {
 					/>
 				)}
 
-				{!activeSearchUrl && !isLoading && (
+				{!urlParam && !isLoading && (
 					<EmptyState
 						icon={Calendar}
 						title="Start Your Journey"
@@ -137,7 +145,7 @@ export default function TimelineSearch() {
 					/>
 				)}
 
-				{!isLoading && results.length === 0 && activeSearchUrl && (
+				{!isLoading && results.length === 0 && urlParam && (
 					<NoResultsState />
 				)}
 
