@@ -1,7 +1,8 @@
 "use client";
 
 import { ArrowUpDown, Table2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { SearchForm } from "@/components/search/search-form";
 import { SearchHeader } from "@/components/search/search-header";
 import {
@@ -17,22 +18,29 @@ import type { SortColumn, SortDirection } from "@/lib/types/archive";
 import { cleanUrl } from "@/lib/utils/formatters";
 
 export default function TableSearch() {
-	const [searchUrl, setSearchUrl] = useState("");
-	const [activeSearchUrl, setActiveSearchUrl] = useState<string>("");
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const urlParam = searchParams.get("url") || "";
+
+	const [searchUrl, setSearchUrl] = useState(urlParam);
 	const [filter, setFilter] = useState("");
 	const [sortColumn, setSortColumn] = useState<SortColumn>("timestamp");
 	const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
-	const searchParams = useMemo(() => {
-		if (!activeSearchUrl) return null;
-		return { url: cleanUrl(activeSearchUrl) };
-	}, [activeSearchUrl]);
+	useEffect(() => {
+		setSearchUrl(urlParam);
+	}, [urlParam]);
 
-	const { data: results, isLoading, isError } = useWaybackSearch(searchParams);
+	const queryParams = useMemo(() => {
+		if (!urlParam) return null;
+		return { url: cleanUrl(urlParam) };
+	}, [urlParam]);
+
+	const { data: results, isLoading, isError } = useWaybackSearch(queryParams);
 
 	const handleSearch = () => {
 		if (!searchUrl.trim()) return;
-		setActiveSearchUrl(searchUrl);
+		router.push(`/table?url=${encodeURIComponent(searchUrl)}`);
 	};
 
 	const handleSort = (column: SortColumn) => {
@@ -135,7 +143,7 @@ export default function TableSearch() {
 					/>
 				)}
 
-				{!isLoading && results.length === 0 && activeSearchUrl && (
+				{!isLoading && results.length === 0 && urlParam && (
 					<NoResultsState message="No archives found" />
 				)}
 
@@ -207,7 +215,7 @@ export default function TableSearch() {
 					</div>
 				)}
 
-				{!activeSearchUrl && !isLoading && (
+				{!urlParam && !isLoading && (
 					<EmptyState
 						icon={Table2}
 						title="Enter a URL to start searching"

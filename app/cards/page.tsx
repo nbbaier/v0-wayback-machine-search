@@ -1,7 +1,8 @@
 "use client";
 
 import { Calendar, LayoutGrid } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { SearchForm } from "@/components/search/search-form";
 import { SearchHeader } from "@/components/search/search-header";
 import { EmptyState, LoadingState } from "@/components/search/search-states";
@@ -11,20 +12,27 @@ import type { GroupedSnapshot } from "@/lib/types/archive";
 import { cleanUrl } from "@/lib/utils/formatters";
 
 export default function CardsSearch() {
-	const [searchUrl, setSearchUrl] = useState("");
-	const [activeSearchUrl, setActiveSearchUrl] = useState<string>("");
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const urlParam = searchParams.get("url") || "";
+
+	const [searchUrl, setSearchUrl] = useState(urlParam);
 	const [filter, setFilter] = useState("");
 
-	const searchParams = useMemo(() => {
-		if (!activeSearchUrl) return null;
-		return { url: cleanUrl(activeSearchUrl) };
-	}, [activeSearchUrl]);
+	useEffect(() => {
+		setSearchUrl(urlParam);
+	}, [urlParam]);
 
-	const { data: results, isLoading, isError } = useWaybackSearch(searchParams);
+	const queryParams = useMemo(() => {
+		if (!urlParam) return null;
+		return { url: cleanUrl(urlParam) };
+	}, [urlParam]);
+
+	const { data: results, isLoading, isError } = useWaybackSearch(queryParams);
 
 	const handleSearch = () => {
 		if (!searchUrl.trim()) return;
-		setActiveSearchUrl(searchUrl);
+		router.push(`/cards?url=${encodeURIComponent(searchUrl)}`);
 	};
 
 	const groupedByDate = useMemo(() => {
@@ -92,7 +100,7 @@ export default function CardsSearch() {
 					/>
 				)}
 
-				{!activeSearchUrl && !isLoading && (
+				{!urlParam && !isLoading && (
 					<EmptyState
 						icon={Calendar}
 						title="Search the Archive"

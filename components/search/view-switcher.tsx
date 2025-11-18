@@ -2,7 +2,7 @@
 
 import { LayoutGrid, Table2, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const views = [
@@ -25,17 +25,22 @@ const views = [
 
 export function ViewSwitcher() {
 	const pathname = usePathname();
+	const searchParams = useSearchParams();
+	const urlParam = searchParams.get("url");
 
 	return (
 		<div className="flex items-center gap-1 bg-muted/50 rounded-lg p-1">
 			{views.map((view) => {
 				const Icon = view.icon;
 				const isActive = pathname === view.href;
+				const href = urlParam
+					? `${view.href}?url=${encodeURIComponent(urlParam)}`
+					: view.href;
 
 				return (
 					<Link
 						key={view.href}
-						href={view.href}
+						href={href}
 						className={cn(
 							"flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
 							isActive

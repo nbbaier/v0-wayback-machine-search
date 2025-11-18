@@ -1,7 +1,8 @@
 "use client";
 
 import { Calendar, Sparkles } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { SearchForm } from "@/components/search/search-form";
 import { SearchHeader } from "@/components/search/search-header";
 import {
@@ -16,20 +17,27 @@ import type { GroupedSnapshotByMonth } from "@/lib/types/archive";
 import { cleanUrl } from "@/lib/utils/formatters";
 
 export default function TimelineSearch() {
-	const [searchUrl, setSearchUrl] = useState("");
-	const [activeSearchUrl, setActiveSearchUrl] = useState<string>("");
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const urlParam = searchParams.get("url") || "";
+
+	const [searchUrl, setSearchUrl] = useState(urlParam);
 	const [selectedYear, setSelectedYear] = useState<string>("");
 
-	const searchParams = useMemo(() => {
-		if (!activeSearchUrl) return null;
-		return { url: cleanUrl(activeSearchUrl) };
-	}, [activeSearchUrl]);
+	useEffect(() => {
+		setSearchUrl(urlParam);
+	}, [urlParam]);
 
-	const { data: results, isLoading, isError } = useWaybackSearch(searchParams);
+	const queryParams = useMemo(() => {
+		if (!urlParam) return null;
+		return { url: cleanUrl(urlParam) };
+	}, [urlParam]);
+
+	const { data: results, isLoading, isError } = useWaybackSearch(queryParams);
 
 	const handleSearch = () => {
 		if (!searchUrl.trim()) return;
-		setActiveSearchUrl(searchUrl);
+		router.push(`/timeline?url=${encodeURIComponent(searchUrl)}`);
 	};
 
 	const groupedByYearMonth = useMemo(() => {
@@ -126,7 +134,7 @@ export default function TimelineSearch() {
 					/>
 				)}
 
-				{!activeSearchUrl && !isLoading && (
+				{!urlParam && !isLoading && (
 					<EmptyState
 						icon={Calendar}
 						title="Start Your Journey"
@@ -137,7 +145,7 @@ export default function TimelineSearch() {
 					/>
 				)}
 
-				{!isLoading && results.length === 0 && activeSearchUrl && (
+				{!isLoading && results.length === 0 && urlParam && (
 					<NoResultsState />
 				)}
 
