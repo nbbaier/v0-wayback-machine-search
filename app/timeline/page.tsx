@@ -1,297 +1,162 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useMemo } from "react"
-import Link from "next/link"
-import { Home, Calendar, ExternalLink, Image, FileText, Clock, Sparkles } from 'lucide-react'
-import { useWaybackSearch } from "@/lib/hooks/useWaybackSearch"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-
-interface ArchiveResult {
-  url: string
-  timestamp: string
-  title: string
-  status: string
-  mimetype: string
-  length?: string
-}
-
-interface GroupedSnapshot {
-  year: string
-  month: string
-  snapshots: ArchiveResult[]
-}
+import { Calendar, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
+import { SearchForm } from "@/components/search/search-form";
+import { SearchHeader } from "@/components/search/search-header";
+import {
+	EmptyState,
+	LoadingState,
+	NoResultsState,
+} from "@/components/search/search-states";
+import { TimelineGroup } from "@/components/snapshot/timeline-group";
+import { Badge } from "@/components/ui/badge";
+import { useWaybackSearch } from "@/lib/hooks/useWaybackSearch";
+import type { GroupedSnapshotByMonth } from "@/lib/types/archive";
+import { cleanUrl } from "@/lib/utils/formatters";
 
 export default function TimelineSearch() {
-  const [searchUrl, setSearchUrl] = useState("")
-  const [activeSearchUrl, setActiveSearchUrl] = useState<string>("")
-  const [selectedYear, setSelectedYear] = useState<string>("")
+	const [searchUrl, setSearchUrl] = useState("");
+	const [activeSearchUrl, setActiveSearchUrl] = useState<string>("");
+	const [selectedYear, setSelectedYear] = useState<string>("");
 
-  const searchParams = useMemo(() => {
-    if (!activeSearchUrl) return null
+	const searchParams = useMemo(() => {
+		if (!activeSearchUrl) return null;
+		return { url: cleanUrl(activeSearchUrl) };
+	}, [activeSearchUrl]);
 
-    let cleanUrl = activeSearchUrl.trim()
-    if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
-      cleanUrl = "https://" + cleanUrl
-    }
+	const { data: results, isLoading, isError } = useWaybackSearch(searchParams);
 
-    return { url: cleanUrl }
-  }, [activeSearchUrl])
+	const handleSearch = () => {
+		if (!searchUrl.trim()) return;
+		setActiveSearchUrl(searchUrl);
+	};
 
-  const { data: results, isLoading, isError } = useWaybackSearch(searchParams)
+	const groupedByYearMonth = useMemo(() => {
+		const groups = new Map<string, GroupedSnapshotByMonth>();
 
-  const handleSearch = () => {
-    if (!searchUrl.trim()) return
-    setActiveSearchUrl(searchUrl)
-  }
+		let filtered = results;
+		if (selectedYear) {
+			filtered = results.filter((r) => r.timestamp.startsWith(selectedYear));
+		}
 
-  const groupedByYearMonth = useMemo(() => {
-    const groups = new Map<string, GroupedSnapshot>()
+		filtered.forEach((snapshot) => {
+			const year = snapshot.timestamp.slice(0, 4);
+			const month = snapshot.timestamp.slice(4, 6);
+			const key = `${year}-${month}`;
 
-    let filtered = results
-    if (selectedYear) {
-      filtered = results.filter(r => r.timestamp.startsWith(selectedYear))
-    }
+			if (!groups.has(key)) {
+				groups.set(key, { year, month, snapshots: [] });
+			}
+			groups.get(key)?.snapshots.push(snapshot);
+		});
 
-    filtered.forEach(snapshot => {
-      const year = snapshot.timestamp.slice(0, 4)
-      const month = snapshot.timestamp.slice(4, 6)
-      const key = `${year}-${month}`
+		return Array.from(groups.values()).sort((a, b) =>
+			`${b.year}${b.month}`.localeCompare(`${a.year}${a.month}`),
+		);
+	}, [results, selectedYear]);
 
-      if (!groups.has(key)) {
-        groups.set(key, { year, month, snapshots: [] })
-      }
-      groups.get(key)!.snapshots.push(snapshot)
-    })
+	const availableYears = useMemo(() => {
+		const years = new Set(results.map((r) => r.timestamp.slice(0, 4)));
+		return Array.from(years).sort().reverse();
+	}, [results]);
 
-    return Array.from(groups.values()).sort((a, b) =>
-      `${b.year}${b.month}`.localeCompare(`${a.year}${a.month}`)
-    )
-  }, [results, selectedYear])
+	return (
+		<div className="min-h-screen bg-gradient-to-br from-purple-50 via-fuchsia-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
+			<div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
+				<div className="max-w-6xl mx-auto px-4 py-4">
+					<SearchHeader
+						title="TimeVault Timeline"
+						description="Visual journey through time"
+						icon={Sparkles}
+						iconBgClass="bg-gradient-to-br from-purple-500 via-fuchsia-600 to-pink-600"
+						titleGradient="from-purple-600 via-fuchsia-600 to-pink-600"
+					/>
 
-  const availableYears = useMemo(() => {
-    const years = new Set(results.map(r => r.timestamp.slice(0, 4)))
-    return Array.from(years).sort().reverse()
-  }, [results])
+					<SearchForm
+						searchUrl={searchUrl}
+						onSearchUrlChange={setSearchUrl}
+						onSearch={handleSearch}
+						isLoading={isLoading}
+						buttonText="Explore"
+						buttonClassName="bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 hover:from-purple-700 hover:via-fuchsia-700 hover:to-pink-700"
+					/>
+				</div>
+			</div>
 
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+			<div className="max-w-6xl mx-auto px-4 py-6">
+				{availableYears.length > 0 && (
+					<div className="mb-6 flex flex-wrap gap-2 items-center">
+						<span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+							Filter by year:
+						</span>
+						<Badge
+							variant={selectedYear === "" ? "default" : "secondary"}
+							className="cursor-pointer"
+							onClick={() => setSelectedYear("")}
+						>
+							All ({results.length})
+						</Badge>
+						{availableYears.map((year) => (
+							<Badge
+								key={year}
+								variant={selectedYear === year ? "default" : "secondary"}
+								className="cursor-pointer"
+								onClick={() => setSelectedYear(year)}
+							>
+								{year} (
+								{results.filter((r) => r.timestamp.startsWith(year)).length})
+							</Badge>
+						))}
+					</div>
+				)}
 
-  const formatTimestamp = (ts: string) => {
-    const year = ts.slice(0, 4)
-    const month = ts.slice(4, 6)
-    const day = ts.slice(6, 8)
-    const hour = ts.slice(8, 10)
-    const minute = ts.slice(10, 12)
-    return `${monthNames[parseInt(month) - 1]} ${day}, ${year} at ${hour}:${minute}`
-  }
+				{isLoading && (
+					<LoadingState
+						message="Traveling through time..."
+						iconClass="text-purple-600 dark:text-purple-400"
+						cardClassName="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-purple-200 dark:border-purple-800"
+					/>
+				)}
 
-  const formatBytes = (bytes: string | undefined) => {
-    if (!bytes) return 'Unknown'
-    const num = parseInt(bytes)
-    if (num < 1024) return `${num}B`
-    if (num < 1024 * 1024) return `${(num / 1024).toFixed(1)}KB`
-    return `${(num / (1024 * 1024)).toFixed(1)}MB`
-  }
+				{isError && (
+					<LoadingState
+						message="Failed to load timeline"
+						cardClassName="border-red-300 dark:border-red-800"
+					/>
+				)}
 
-  const getScreenshotUrl = (timestamp: string, url: string) => {
-    return `https://web.archive.org/web/${timestamp}im_/${url}`
-  }
+				{!activeSearchUrl && !isLoading && (
+					<EmptyState
+						icon={Calendar}
+						title="Start Your Journey"
+						description="Enter a URL to visualize its history on the timeline"
+						iconBgClass="bg-gradient-to-br from-purple-500 via-fuchsia-600 to-pink-600"
+						titleGradient="from-purple-600 via-fuchsia-600 to-pink-600"
+						cardClassName="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-purple-200 dark:border-purple-800"
+					/>
+				)}
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-fuchsia-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
-      {/* Header */}
-      <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-br from-purple-500 via-fuchsia-600 to-pink-600 rounded-lg">
-                  <Sparkles className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 bg-clip-text text-transparent">
-                    TimeVault Timeline
-                  </h1>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Visual journey through time</p>
-                </div>
-              </div>
-            </div>
-            <Link
-              href="/"
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 flex items-center gap-2 transition-colors"
-            >
-              <Home className="h-4 w-4" />
-              Home
-            </Link>
-          </div>
+				{!isLoading && results.length === 0 && activeSearchUrl && (
+					<NoResultsState />
+				)}
 
-          <div className="flex gap-2">
-            <Input
-              placeholder="https://example.com"
-              value={searchUrl}
-              onChange={(e) => setSearchUrl(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="flex-1"
-            />
-            <Button onClick={handleSearch} disabled={isLoading} className="bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 hover:from-purple-700 hover:via-fuchsia-700 hover:to-pink-700">
-              {isLoading ? 'Searching...' : 'Explore'}
-            </Button>
-          </div>
-        </div>
-      </div>
+				{groupedByYearMonth.length > 0 && !isLoading && (
+					<div className="relative">
+						<div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-400 via-fuchsia-400 to-pink-400" />
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Year Filter */}
-        {availableYears.length > 0 && (
-          <div className="mb-6 flex flex-wrap gap-2 items-center">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by year:</span>
-            <Badge
-              variant={selectedYear === "" ? "default" : "secondary"}
-              className="cursor-pointer"
-              onClick={() => setSelectedYear("")}
-            >
-              All ({results.length})
-            </Badge>
-            {availableYears.map(year => (
-              <Badge
-                key={year}
-                variant={selectedYear === year ? "default" : "secondary"}
-                className="cursor-pointer"
-                onClick={() => setSelectedYear(year)}
-              >
-                {year} ({results.filter(r => r.timestamp.startsWith(year)).length})
-              </Badge>
-            ))}
-          </div>
-        )}
-
-        {/* Loading State */}
-        {isLoading && (
-          <Card className="p-12 text-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-purple-200 dark:border-purple-800">
-            <div className="flex flex-col items-center gap-4">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 rounded-full blur-xl opacity-50 animate-pulse" />
-                <Clock className="h-12 w-12 text-purple-600 dark:text-purple-400 animate-spin relative" />
-              </div>
-              <p className="text-gray-600 dark:text-gray-400 font-medium">Traveling through time...</p>
-            </div>
-          </Card>
-        )}
-
-        {/* Error State */}
-        {isError && (
-          <Card className="p-12 text-center border-red-300 dark:border-red-800">
-            <p className="text-red-600 dark:text-red-400 font-medium">Failed to load timeline</p>
-          </Card>
-        )}
-
-        {/* Empty State */}
-        {!activeSearchUrl && !isLoading && (
-          <Card className="p-12 text-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-purple-200 dark:border-purple-800">
-            <div className="inline-block p-4 bg-gradient-to-br from-purple-500 via-fuchsia-600 to-pink-600 rounded-2xl mb-4">
-              <Calendar className="h-16 w-16 text-white" />
-            </div>
-            <h3 className="text-xl font-bold mb-2 bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 bg-clip-text text-transparent">Start Your Journey</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Enter a URL to visualize its history on the timeline
-            </p>
-          </Card>
-        )}
-
-        {!isLoading && results.length === 0 && activeSearchUrl && (
-          <Card className="p-12 text-center">
-            <p className="text-gray-600 dark:text-gray-400">No snapshots found in the archive</p>
-          </Card>
-        )}
-
-        {/* Timeline */}
-        {groupedByYearMonth.length > 0 && !isLoading && (
-          <div className="relative">
-            {/* Vertical Line */}
-            <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-400 via-fuchsia-400 to-pink-400" />
-
-            <div className="space-y-8">
-              {groupedByYearMonth.map((group, groupIdx) => (
-                <div key={`${group.year}-${group.month}`} className="relative">
-                  {/* Timeline Marker */}
-                  <div className="absolute left-4 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-purple-500 via-fuchsia-600 to-pink-600 border-4 border-white dark:border-gray-900 shadow-lg shadow-purple-500/50 z-10 flex items-center justify-center">
-                    <Calendar className="h-3 w-3 md:h-4 md:w-4 text-white" />
-                  </div>
-
-                  {/* Content */}
-                  <div className={`ml-16 md:ml-0 ${groupIdx % 2 === 0 ? 'md:mr-[52%]' : 'md:ml-[52%]'}`}>
-                    <div className="mb-3">
-                      <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">
-                        {monthNames[parseInt(group.month) - 1]} {group.year}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {group.snapshots.length} snapshot{group.snapshots.length !== 1 ? 's' : ''}
-                      </p>
-                    </div>
-
-                    <div className="space-y-3">
-                      {group.snapshots.map((snapshot, idx) => (
-                        <Card key={idx} className="overflow-hidden bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-purple-200/50 dark:border-purple-800/50 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:-translate-y-1">
-                          <CardContent className="p-4">
-                            <div className="flex flex-col sm:flex-row gap-4">
-                              {/* Preview */}
-                              <div className="w-full sm:w-32 h-24 bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/20 dark:to-blue-900/20 rounded flex items-center justify-center shrink-0">
-                                {snapshot.mimetype.includes('image') ? (
-                                  <Image className="h-8 w-8 text-purple-600" />
-                                ) : snapshot.mimetype.includes('html') ? (
-                                  <FileText className="h-8 w-8 text-blue-600" />
-                                ) : (
-                                  <FileText className="h-8 w-8 text-gray-600" />
-                                )}
-                              </div>
-
-                              {/* Details */}
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                  <Badge
-                                    variant={snapshot.status === '200' ? 'default' : 'secondary'}
-                                    className="text-xs"
-                                  >
-                                    {snapshot.status}
-                                  </Badge>
-                                  <span className="text-xs text-gray-600 dark:text-gray-400">
-                                    {snapshot.mimetype}
-                                  </span>
-                                  {snapshot.length && (
-                                    <span className="text-xs text-gray-600 dark:text-gray-400">
-                                      {formatBytes(snapshot.length)}
-                                    </span>
-                                  )}
-                                </div>
-
-                                <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                                  {formatTimestamp(snapshot.timestamp)}
-                                </p>
-
-                                <a
-                                  href={`https://web.archive.org/web/${snapshot.timestamp}/${snapshot.url}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-2 text-sm text-purple-600 dark:text-purple-400 hover:underline"
-                                >
-                                  <ExternalLink className="h-4 w-4" />
-                                  View Snapshot
-                                </a>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  )
+						<div className="space-y-8">
+							{groupedByYearMonth.map((group, groupIdx) => (
+								<TimelineGroup
+									key={`${group.year}-${group.month}`}
+									group={group}
+									groupIdx={groupIdx}
+								/>
+							))}
+						</div>
+					</div>
+				)}
+			</div>
+		</div>
+	);
 }
