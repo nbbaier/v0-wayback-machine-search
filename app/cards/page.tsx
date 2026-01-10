@@ -39,12 +39,13 @@ export default function CardsSearch() {
 		let filtered = results;
 
 		if (filter) {
+			const lowerFilter = filter.toLowerCase();
 			filtered = results.filter(
 				(r) =>
-					r.url.toLowerCase().includes(filter.toLowerCase()) ||
+					r.url.toLowerCase().includes(lowerFilter) ||
 					r.timestamp.includes(filter) ||
 					r.status.includes(filter) ||
-					r.mimetype.toLowerCase().includes(filter.toLowerCase()),
+					r.mimetype.toLowerCase().includes(lowerFilter),
 			);
 		}
 
