@@ -1,4 +1,4 @@
-import { type LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { ViewSwitcher } from "./view-switcher";
 
 interface SearchHeaderProps {
