@@ -28,22 +28,31 @@ export function SearchForm({
 }: SearchFormProps) {
 	return (
 		<div className="space-y-3">
-			<div className="flex gap-2">
+			<form
+				className="flex gap-2"
+				onSubmit={(e) => {
+					e.preventDefault();
+					onSearch();
+				}}
+			>
 				<Input
 					placeholder="https://example.com"
 					value={searchUrl}
 					onChange={(e) => onSearchUrlChange(e.target.value)}
-					onKeyDown={(e) => e.key === "Enter" && onSearch()}
 					className="flex-1"
+					type="url"
+					inputMode="url"
+					aria-label="Search URL"
 				/>
 				<Button
-					onClick={onSearch}
+					type="submit"
 					disabled={isLoading}
 					className={buttonClassName}
+					aria-busy={isLoading}
 				>
 					{isLoading ? buttonLoadingText : buttonText}
 				</Button>
-			</div>
+			</form>
 
 			{showFilter && onFilterChange && (
 				<Input
@@ -51,6 +60,7 @@ export function SearchForm({
 					value={filter || ""}
 					onChange={(e) => onFilterChange(e.target.value)}
 					className="w-full"
+					aria-label="Filter snapshots"
 				/>
 			)}
 		</div>
