@@ -198,7 +198,7 @@ export function VirtualizedSnapshotList({
 													{snapshot.length && (
 														<span className="flex items-center gap-1 shrink-0">
 															<FileText className="h-3 w-3" />
-															{formatBytes(snapshot.length)}
+															{formatBytes(Number(snapshot.length))}
 														</span>
 													)}
 													<span className="truncate min-w-0">
