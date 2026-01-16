@@ -18,8 +18,6 @@ export default function CardsSearch() {
 
 	const [searchUrl, setSearchUrl] = useState(urlParam);
 	const [filter, setFilter] = useState("");
-
-	// Defer the filter value to keep the UI responsive while typing
 	const deferredFilter = useDeferredValue(filter);
 
 	useEffect(() => {
@@ -41,7 +39,6 @@ export default function CardsSearch() {
 	const groupedByDate = useMemo(() => {
 		let filtered = results;
 
-		// Use deferredFilter to avoid blocking the main thread during typing
 		if (deferredFilter) {
 			const lowerFilter = deferredFilter.toLowerCase();
 			filtered = results.filter(
