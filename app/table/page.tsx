@@ -2,7 +2,7 @@
 
 import { Table2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { SearchForm } from "@/components/search/search-form";
 import { SearchHeader } from "@/components/search/search-header";
 import {
@@ -14,7 +14,7 @@ import {
 import { VirtualizedTable } from "@/components/snapshot/virtualized-table";
 import { Input } from "@/components/ui/input";
 import { useWaybackSearch } from "@/lib/hooks/useWaybackSearch";
-import type { ArchiveResult, SortColumn, SortDirection } from "@/lib/types/archive";
+import type { SortColumn, SortDirection } from "@/lib/types/archive";
 import { cleanUrl } from "@/lib/utils/formatters";
 
 export default function TableSearch() {
@@ -30,7 +30,7 @@ export default function TableSearch() {
 	const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
 	const tableRef = useRef<HTMLTableElement>(null);
-	const [tableOffset, setTableOffset] = useState(0);
+	const [_tableOffset, setTableOffset] = useState(0);
 
 	useEffect(() => {
 		setSearchUrl(urlParam);
@@ -97,25 +97,25 @@ export default function TableSearch() {
 		});
 	}, [results, deferredFilter, sortColumn, sortDirection]);
 
-	const virtualizer = useWindowVirtualizer({
-		count: sortedAndFilteredResults.length,
-		estimateSize: () => 53, // Approximate height of a row
-		overscan: 10,
-		scrollMargin: tableOffset,
-	});
+	// const virtualizer = useWindowVirtualizer({
+	// 	count: sortedAndFilteredResults.length,
+	// 	estimateSize: () => 53, // Approximate height of a row
+	// 	overscan: 10,
+	// 	scrollMargin: tableOffset,
+	// });
 
-	const virtualItems = virtualizer.getVirtualItems();
-	const totalSize = virtualizer.getTotalSize();
+	// const virtualItems = virtualizer.getVirtualItems();
+	// const totalSize = virtualizer.getTotalSize();
 
-	const paddingTop =
-		virtualItems.length > 0 ? virtualItems[0].start - tableOffset : 0;
-	const paddingBottom =
-		virtualItems.length > 0
-			? totalSize - virtualItems[virtualItems.length - 1].end
-			: 0;
+	// const paddingTop =
+	// 	virtualItems.length > 0 ? virtualItems[0].start - tableOffset : 0;
+	// const paddingBottom =
+	// 	virtualItems.length > 0
+	// 		? totalSize - virtualItems[virtualItems.length - 1].end
+	// 		: 0;
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50 dark:from-gray-900 dark:via-yellow-900/20 dark:to-gray-900">
+		<div className="min-h-screen bg-linear-to-br from-yellow-50 via-orange-50 to-amber-50 dark:from-gray-900 dark:via-yellow-900/20 dark:to-gray-900">
 			<div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-20">
 				<div className="max-w-7xl mx-auto px-4 py-3">
 					<SearchHeader

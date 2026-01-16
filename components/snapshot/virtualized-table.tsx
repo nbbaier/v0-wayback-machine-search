@@ -67,7 +67,7 @@ export function VirtualizedTable({
 	return (
 		<div className="overflow-x-auto">
 			<table ref={tableRef} className="w-full text-sm">
-				<thead className="bg-gradient-to-r from-yellow-100 via-orange-100 to-yellow-100 dark:from-yellow-950/30 dark:via-orange-950/30 dark:to-yellow-950/30 border-b border-yellow-200 dark:border-yellow-700">
+				<thead className="bg-linear-to-r from-yellow-100 via-orange-100 to-yellow-100 dark:from-yellow-950/30 dark:via-orange-950/30 dark:to-yellow-950/30 border-b border-yellow-200 dark:border-yellow-700">
 					<tr>
 						<th className="px-4 py-3 text-left font-medium w-16">#</th>
 						<th
