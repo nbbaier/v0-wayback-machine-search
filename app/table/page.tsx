@@ -66,8 +66,8 @@ export default function TableSearch() {
 		}
 
 		return [...filtered].sort((a, b) => {
-			let aVal: any = a[sortColumn] || "";
-			let bVal: any = b[sortColumn] || "";
+			let aVal: string | number = a[sortColumn] || "";
+			let bVal: string | number = b[sortColumn] || "";
 
 			if (sortColumn === "length") {
 				aVal = parseInt(a.length || "0", 10);
