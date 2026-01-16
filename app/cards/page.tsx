@@ -2,7 +2,7 @@
 
 import { Calendar, LayoutGrid } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { SearchForm } from "@/components/search/search-form";
 import { SearchHeader } from "@/components/search/search-header";
 import { EmptyState, LoadingState } from "@/components/search/search-states";
@@ -18,6 +18,9 @@ export default function CardsSearch() {
 
 	const [searchUrl, setSearchUrl] = useState(urlParam);
 	const [filter, setFilter] = useState("");
+
+	// Defer the filter value to keep the UI responsive while typing
+	const deferredFilter = useDeferredValue(filter);
 
 	useEffect(() => {
 		setSearchUrl(urlParam);
@@ -38,13 +41,14 @@ export default function CardsSearch() {
 	const groupedByDate = useMemo(() => {
 		let filtered = results;
 
-		if (filter) {
-			const lowerFilter = filter.toLowerCase();
+		// Use deferredFilter to avoid blocking the main thread during typing
+		if (deferredFilter) {
+			const lowerFilter = deferredFilter.toLowerCase();
 			filtered = results.filter(
 				(r) =>
 					r.url.toLowerCase().includes(lowerFilter) ||
-					r.timestamp.includes(filter) ||
-					r.status.includes(filter) ||
+					r.timestamp.includes(deferredFilter) ||
+					r.status.includes(deferredFilter) ||
 					r.mimetype.toLowerCase().includes(lowerFilter),
 			);
 		}
@@ -67,7 +71,7 @@ export default function CardsSearch() {
 				),
 			}))
 			.sort((a, b) => b.date.localeCompare(a.date));
-	}, [results, filter]);
+	}, [results, deferredFilter]);
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">

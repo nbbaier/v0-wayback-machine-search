@@ -2,7 +2,7 @@
 
 import { ArrowUpDown, Table2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { SearchForm } from "@/components/search/search-form";
 import { SearchHeader } from "@/components/search/search-header";
 import {
@@ -26,6 +26,9 @@ export default function TableSearch() {
 	const [filter, setFilter] = useState("");
 	const [sortColumn, setSortColumn] = useState<SortColumn>("timestamp");
 	const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+	// Defer the filter value to keep the UI responsive while typing
+	const deferredFilter = useDeferredValue(filter);
 
 	useEffect(() => {
 		setSearchUrl(urlParam);
@@ -55,13 +58,14 @@ export default function TableSearch() {
 	const sortedAndFilteredResults = useMemo(() => {
 		let filtered = results;
 
-		if (filter) {
+		// Use deferredFilter to avoid blocking the main thread during typing
+		if (deferredFilter) {
 			filtered = results.filter(
 				(r) =>
-					r.url.toLowerCase().includes(filter.toLowerCase()) ||
-					r.timestamp.includes(filter) ||
-					r.status.includes(filter) ||
-					r.mimetype.toLowerCase().includes(filter.toLowerCase()),
+					r.url.toLowerCase().includes(deferredFilter.toLowerCase()) ||
+					r.timestamp.includes(deferredFilter) ||
+					r.status.includes(deferredFilter) ||
+					r.mimetype.toLowerCase().includes(deferredFilter.toLowerCase()),
 			);
 		}
 
@@ -78,7 +82,7 @@ export default function TableSearch() {
 			if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
 			return 0;
 		});
-	}, [results, filter, sortColumn, sortDirection]);
+	}, [results, deferredFilter, sortColumn, sortDirection]);
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50 dark:from-gray-900 dark:via-yellow-900/20 dark:to-gray-900">
