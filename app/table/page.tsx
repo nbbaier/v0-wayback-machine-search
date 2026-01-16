@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpDown, Table2 } from "lucide-react";
+import { Table2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { SearchForm } from "@/components/search/search-form";
@@ -11,7 +11,7 @@ import {
 	LoadingState,
 	NoResultsState,
 } from "@/components/search/search-states";
-import { TableSnapshotRow } from "@/components/snapshot/table-snapshot-row";
+import { VirtualizedTable } from "@/components/snapshot/virtualized-table";
 import { Input } from "@/components/ui/input";
 import { useWaybackSearch } from "@/lib/hooks/useWaybackSearch";
 import type { SortColumn, SortDirection } from "@/lib/types/archive";
@@ -66,12 +66,12 @@ export default function TableSearch() {
 		}
 
 		return [...filtered].sort((a, b) => {
-			let aVal: any = a[sortColumn] || "";
-			let bVal: any = b[sortColumn] || "";
+			let aVal: string | number = a[sortColumn] || "";
+			let bVal: string | number = b[sortColumn] || "";
 
 			if (sortColumn === "length") {
-				aVal = parseInt(a.length || "0", 10);
-				bVal = parseInt(b.length || "0", 10);
+				aVal = Number.parseInt(a.length || "0", 10);
+				bVal = Number.parseInt(b.length || "0", 10);
 			}
 
 			if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
@@ -149,69 +149,12 @@ export default function TableSearch() {
 
 				{sortedAndFilteredResults.length > 0 && !isLoading && (
 					<div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-yellow-200 dark:border-yellow-800 rounded-lg overflow-hidden shadow-xl shadow-yellow-500/20">
-						<div className="overflow-x-auto">
-							<table className="w-full text-sm">
-								<thead className="bg-gradient-to-r from-yellow-100 via-orange-100 to-yellow-100 dark:from-yellow-950/30 dark:via-orange-950/30 dark:to-yellow-950/30 border-b border-yellow-200 dark:border-yellow-700">
-									<tr>
-										<th className="px-4 py-3 text-left font-medium">#</th>
-										<th
-											className="px-4 py-3 text-left font-medium cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
-											onClick={() => handleSort("timestamp")}
-										>
-											<div className="flex items-center gap-2">
-												Timestamp
-												{sortColumn === "timestamp" && (
-													<ArrowUpDown className="h-3 w-3" />
-												)}
-											</div>
-										</th>
-										<th
-											className="px-4 py-3 text-left font-medium cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
-											onClick={() => handleSort("status")}
-										>
-											<div className="flex items-center gap-2">
-												Status
-												{sortColumn === "status" && (
-													<ArrowUpDown className="h-3 w-3" />
-												)}
-											</div>
-										</th>
-										<th
-											className="px-4 py-3 text-left font-medium cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
-											onClick={() => handleSort("mimetype")}
-										>
-											<div className="flex items-center gap-2">
-												MIME Type
-												{sortColumn === "mimetype" && (
-													<ArrowUpDown className="h-3 w-3" />
-												)}
-											</div>
-										</th>
-										<th
-											className="px-4 py-3 text-left font-medium cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
-											onClick={() => handleSort("length")}
-										>
-											<div className="flex items-center gap-2">
-												Size
-												{sortColumn === "length" && (
-													<ArrowUpDown className="h-3 w-3" />
-												)}
-											</div>
-										</th>
-										<th className="px-4 py-3 text-left font-medium">Action</th>
-									</tr>
-								</thead>
-								<tbody className="divide-y divide-yellow-200/50 dark:divide-yellow-800/50">
-									{sortedAndFilteredResults.map((result, idx) => (
-										<TableSnapshotRow
-											key={`${result.timestamp}-${result.url}-${idx}`}
-											snapshot={result}
-											index={idx}
-										/>
-									))}
-								</tbody>
-							</table>
-						</div>
+						<VirtualizedTable
+							data={sortedAndFilteredResults}
+							sortColumn={sortColumn}
+							sortDirection={sortDirection}
+							onSort={handleSort}
+						/>
 					</div>
 				)}
 
