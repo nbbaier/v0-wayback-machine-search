@@ -2,7 +2,7 @@
 
 import { Table2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { SearchForm } from "@/components/search/search-form";
 import { SearchHeader } from "@/components/search/search-header";
 import {
@@ -14,7 +14,7 @@ import {
 import { VirtualizedTable } from "@/components/snapshot/virtualized-table";
 import { Input } from "@/components/ui/input";
 import { useWaybackSearch } from "@/lib/hooks/useWaybackSearch";
-import type { SortColumn, SortDirection } from "@/lib/types/archive";
+import type { ArchiveResult, SortColumn, SortDirection } from "@/lib/types/archive";
 import { cleanUrl } from "@/lib/utils/formatters";
 
 export default function TableSearch() {
@@ -24,12 +24,29 @@ export default function TableSearch() {
 
 	const [searchUrl, setSearchUrl] = useState(urlParam);
 	const [filter, setFilter] = useState("");
+	// Defer the filter value to keep the UI responsive while filtering occurs
+	const deferredFilter = useDeferredValue(filter);
 	const [sortColumn, setSortColumn] = useState<SortColumn>("timestamp");
 	const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+	const tableRef = useRef<HTMLTableElement>(null);
+	const [tableOffset, setTableOffset] = useState(0);
 
 	useEffect(() => {
 		setSearchUrl(urlParam);
 	}, [urlParam]);
+
+	// Update offset when results change or on mount, to ensure virtualization starts correctly
+	useEffect(() => {
+		const updateOffset = () => {
+			if (tableRef.current) {
+				setTableOffset(tableRef.current.offsetTop);
+			}
+		};
+		updateOffset();
+		window.addEventListener("resize", updateOffset);
+		return () => window.removeEventListener("resize", updateOffset);
+	}, []);
 
 	const queryParams = useMemo(() => {
 		if (!urlParam) return null;
@@ -55,13 +72,13 @@ export default function TableSearch() {
 	const sortedAndFilteredResults = useMemo(() => {
 		let filtered = results;
 
-		if (filter) {
+		if (deferredFilter) {
 			filtered = results.filter(
 				(r) =>
-					r.url.toLowerCase().includes(filter.toLowerCase()) ||
-					r.timestamp.includes(filter) ||
-					r.status.includes(filter) ||
-					r.mimetype.toLowerCase().includes(filter.toLowerCase()),
+					r.url.toLowerCase().includes(deferredFilter.toLowerCase()) ||
+					r.timestamp.includes(deferredFilter) ||
+					r.status.includes(deferredFilter) ||
+					r.mimetype.toLowerCase().includes(deferredFilter.toLowerCase()),
 			);
 		}
 
@@ -78,7 +95,24 @@ export default function TableSearch() {
 			if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
 			return 0;
 		});
-	}, [results, filter, sortColumn, sortDirection]);
+	}, [results, deferredFilter, sortColumn, sortDirection]);
+
+	const virtualizer = useWindowVirtualizer({
+		count: sortedAndFilteredResults.length,
+		estimateSize: () => 53, // Approximate height of a row
+		overscan: 10,
+		scrollMargin: tableOffset,
+	});
+
+	const virtualItems = virtualizer.getVirtualItems();
+	const totalSize = virtualizer.getTotalSize();
+
+	const paddingTop =
+		virtualItems.length > 0 ? virtualItems[0].start - tableOffset : 0;
+	const paddingBottom =
+		virtualItems.length > 0
+			? totalSize - virtualItems[virtualItems.length - 1].end
+			: 0;
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50 dark:from-gray-900 dark:via-yellow-900/20 dark:to-gray-900">

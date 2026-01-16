@@ -1,0 +1,25 @@
+
+> my-v0-project@0.1.0 dev /app
+> next dev
+
+⚠ `eslint` configuration in next.config.mjs is no longer supported. See more info here: https://nextjs.org/docs/app/api-reference/cli/next#next-lint-options
+⚠ Invalid next.config.mjs options detected:
+⚠     Unrecognized key(s) in object: 'eslint'
+⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+
+✓ Starting...
+✓ Ready in 732ms
+○ Compiling /table ...
+ GET /table?url=google.com 200 in 5.4s (compile: 4.8s, render: 575ms)
+[v0] Cache miss, fetching from CDX API: https://web.archive.org/cdx/search/cdx?url=https%3A%2F%2Fgoogle.com&output=json&fl=timestamp%2Coriginal%2Cstatuscode%2Cmimetype%2Clength&limit=1000
+ GET /api/wayback?url=https%3A%2F%2Fgoogle.com 200 in 10.3s (compile: 693ms, render: 9.6s)
+ GET /table?url=google.com 200 in 94ms (compile: 5ms, render: 88ms)
+[v0] Cache miss, fetching from CDX API: https://web.archive.org/cdx/search/cdx?url=https%3A%2F%2Fgoogle.com&output=json&fl=timestamp%2Coriginal%2Cstatuscode%2Cmimetype%2Clength&limit=1000
+ GET /api/wayback?url=https%3A%2F%2Fgoogle.com 200 in 10.1s (compile: 4ms, render: 10.1s)
+[v0] Total snapshots returned: 1000
+ GET /table?url=google.com 200 in 67ms (compile: 4ms, render: 63ms)
+[v0] Cache hit for: https://web.archive.org/cdx/search/cdx?url=https%3A%2F%2Fgoogle.com&output=json&fl=timestamp%2Coriginal%2Cstatuscode%2Cmimetype%2Clength&limit=1000
+ GET /api/wayback?url=https%3A%2F%2Fgoogle.com 200 in 11ms (compile: 3ms, render: 8ms)
