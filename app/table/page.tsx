@@ -2,7 +2,7 @@
 
 import { Table2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { SearchForm } from "@/components/search/search-form";
 import { SearchHeader } from "@/components/search/search-header";
 import {
@@ -32,7 +32,6 @@ export default function TableSearch() {
 
 	const tableRef = useRef<HTMLTableElement>(null);
 	const [_tableOffset, setTableOffset] = useState(0);
-
 	useEffect(() => {
 		setSearchUrl(urlParam);
 	}, [urlParam]);
