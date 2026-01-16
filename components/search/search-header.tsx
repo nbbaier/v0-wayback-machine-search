@@ -25,7 +25,7 @@ export function SearchHeader({
 					</div>
 					<div>
 						<h1
-							className={`text-2xl font-bold bg-gradient-to-r ${titleGradient} bg-clip-text text-transparent`}
+							className={`text-2xl font-bold bg-linear-to-r ${titleGradient} bg-clip-text text-transparent`}
 						>
 							{title}
 						</h1>

@@ -2,7 +2,7 @@
 
 import { Calendar, LayoutGrid } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { SearchForm } from "@/components/search/search-form";
 import { SearchHeader } from "@/components/search/search-header";
 import { EmptyState, LoadingState } from "@/components/search/search-states";
