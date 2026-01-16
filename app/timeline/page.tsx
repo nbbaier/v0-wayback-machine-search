@@ -145,9 +145,7 @@ export default function TimelineSearch() {
 					/>
 				)}
 
-				{!isLoading && results.length === 0 && urlParam && (
-					<NoResultsState />
-				)}
+				{!isLoading && results.length === 0 && urlParam && <NoResultsState />}
 
 				{groupedByYearMonth.length > 0 && !isLoading && (
 					<div className="relative">

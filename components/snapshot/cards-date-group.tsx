@@ -27,17 +27,21 @@ export const CardsDateGroup = memo(function CardsDateGroup({
 					<h4 className="text-lg font-medium bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
 						{formatDate(group.date)}
 					</h4>
-					<div className="flex items-center gap-2">
-						<Badge
-							variant="secondary"
-							className="bg-primary/10 text-primary border-primary/20"
-						>
-							{group.snapshots.length} snapshot
-							{group.snapshots.length !== 1 ? "s" : ""}
-						</Badge>
-					</div>
+					<p className="text-muted-foreground text-sm group-data-[state=open]:hidden">
+						Click to expand
+					</p>
+					<p className="text-muted-foreground text-sm hidden group-data-[state=open]:block">
+						Click to collapse
+					</p>
 				</div>
-				<ChevronDown className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+				<Badge
+					variant="secondary"
+					className="bg-primary/10 text-primary border-primary/20"
+				>
+					{group.snapshots.length} snapshot
+					{group.snapshots.length !== 1 ? "s" : ""}
+				</Badge>
+				<ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
 			</CollapsibleTrigger>
 			<CollapsibleContent className="border-t pt-1 text-muted-foreground text-sm">
 				<div className="divide-y divide-border">

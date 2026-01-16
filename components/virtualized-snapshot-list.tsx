@@ -171,9 +171,9 @@ export function VirtualizedSnapshotList({
 									</div>
 								</CardHeader>
 								<CardContent className="space-y-2 px-4 pb-3">
-									{group.snapshots.map((snapshot, snapshotIndex) => (
+									{group.snapshots.map((snapshot) => (
 										<div
-											key={`${snapshot.timestamp}-${snapshotIndex}`}
+											key={`${snapshot.timestamp}-${snapshot.url}`}
 											className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-background/50 border border-border/50"
 										>
 											<div className="flex flex-col gap-2 flex-1 min-w-0">
