@@ -3,7 +3,7 @@ import {
 	CollapsibleContent,
 	CollapsibleTrigger,
 } from "@radix-ui/react-collapsible";
-import { Calendar } from "lucide-react";
+import { Calendar, ChevronDown } from "lucide-react";
 import { memo } from "react";
 import { Badge } from "@/components/ui/badge";
 import type { GroupedSnapshot } from "@/lib/types/archive";
@@ -41,6 +41,7 @@ export const CardsDateGroup = memo(function CardsDateGroup({
 					{group.snapshots.length} snapshot
 					{group.snapshots.length !== 1 ? "s" : ""}
 				</Badge>
+				<ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
 			</CollapsibleTrigger>
 			<CollapsibleContent className="border-t pt-1 text-muted-foreground text-sm">
 				<div className="divide-y divide-border">
