@@ -27,6 +27,12 @@ export const CardsDateGroup = memo(function CardsDateGroup({
 					<h4 className="text-lg font-medium bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
 						{formatDate(group.date)}
 					</h4>
+					<p className="text-muted-foreground text-sm group-data-[state=open]:hidden">
+						Click to expand
+					</p>
+					<p className="text-muted-foreground text-sm hidden group-data-[state=open]:block">
+						Click to collapse
+					</p>
 				</div>
 				<Badge
 					variant="secondary"

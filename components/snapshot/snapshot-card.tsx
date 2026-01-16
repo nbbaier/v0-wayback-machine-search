@@ -1,13 +1,13 @@
-import { memo } from "react";
 import { Clock, ExternalLink } from "lucide-react";
+import { memo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { ArchiveSnapshot } from "@/lib/types/archive";
+import type { ArchiveResult } from "@/lib/types/archive";
 import { formatBytes, formatTime } from "@/lib/utils/formatters";
 import { StatusBadge } from "./status-badge";
 
 interface SnapshotCardProps {
-	snapshot: ArchiveSnapshot;
+	snapshot: ArchiveResult;
 }
 
 export const SnapshotCard = memo(function SnapshotCard({
@@ -46,7 +46,7 @@ export const SnapshotCard = memo(function SnapshotCard({
 
 				<Button
 					size="sm"
-					className="bg-primary hover:opacity-90 text-primary-foreground shadow-md hover:shadow-lg hover:scale-105 transition-all"
+					className="bg-primary hover:opacity-90 text-primary-foreground shadow-md hover:shadow-lg hover:scale-105 transition-all shrink-0"
 					asChild
 				>
 					<a
@@ -54,7 +54,7 @@ export const SnapshotCard = memo(function SnapshotCard({
 						target="_blank"
 						rel="noopener noreferrer"
 						onClick={(e) => e.stopPropagation()}
-						className="shrink-0"
+						aria-label={`Open archive for ${snapshot.url} from ${formatTime(snapshot.timestamp)} in new tab`}
 					>
 						<ExternalLink className="h-4 w-4 mr-1" />
 						Open Archive
