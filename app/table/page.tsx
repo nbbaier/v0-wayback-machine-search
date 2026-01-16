@@ -1,5 +1,6 @@
 "use client";
 
+import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { ArrowUpDown, Table2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
@@ -14,7 +15,7 @@ import {
 import { TableSnapshotRow } from "@/components/snapshot/table-snapshot-row";
 import { Input } from "@/components/ui/input";
 import { useWaybackSearch } from "@/lib/hooks/useWaybackSearch";
-import type { SortColumn, SortDirection } from "@/lib/types/archive";
+import type { ArchiveResult, SortColumn, SortDirection } from "@/lib/types/archive";
 import { cleanUrl } from "@/lib/utils/formatters";
 
 export default function TableSearch() {
@@ -29,9 +30,24 @@ export default function TableSearch() {
 	const [sortColumn, setSortColumn] = useState<SortColumn>("timestamp");
 	const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
+	const tableRef = useRef<HTMLTableElement>(null);
+	const [tableOffset, setTableOffset] = useState(0);
+
 	useEffect(() => {
 		setSearchUrl(urlParam);
 	}, [urlParam]);
+
+	// Update offset when results change or on mount, to ensure virtualization starts correctly
+	useEffect(() => {
+		const updateOffset = () => {
+			if (tableRef.current) {
+				setTableOffset(tableRef.current.offsetTop);
+			}
+		};
+		updateOffset();
+		window.addEventListener("resize", updateOffset);
+		return () => window.removeEventListener("resize", updateOffset);
+	}, []);
 
 	const queryParams = useMemo(() => {
 		if (!urlParam) return null;
@@ -68,12 +84,12 @@ export default function TableSearch() {
 		}
 
 		return [...filtered].sort((a, b) => {
-			let aVal: any = a[sortColumn] || "";
-			let bVal: any = b[sortColumn] || "";
+			let aVal: string | number = a[sortColumn as keyof ArchiveResult] || "";
+			let bVal: string | number = b[sortColumn as keyof ArchiveResult] || "";
 
 			if (sortColumn === "length") {
-				aVal = parseInt(a.length || "0", 10);
-				bVal = parseInt(b.length || "0", 10);
+				aVal = Number.parseInt(a.length || "0", 10);
+				bVal = Number.parseInt(b.length || "0", 10);
 			}
 
 			if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
@@ -81,6 +97,23 @@ export default function TableSearch() {
 			return 0;
 		});
 	}, [results, deferredFilter, sortColumn, sortDirection]);
+
+	const virtualizer = useWindowVirtualizer({
+		count: sortedAndFilteredResults.length,
+		estimateSize: () => 53, // Approximate height of a row
+		overscan: 10,
+		scrollMargin: tableOffset,
+	});
+
+	const virtualItems = virtualizer.getVirtualItems();
+	const totalSize = virtualizer.getTotalSize();
+
+	const paddingTop =
+		virtualItems.length > 0 ? virtualItems[0].start - tableOffset : 0;
+	const paddingBottom =
+		virtualItems.length > 0
+			? totalSize - virtualItems[virtualItems.length - 1].end
+			: 0;
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50 dark:from-gray-900 dark:via-yellow-900/20 dark:to-gray-900">
@@ -152,7 +185,7 @@ export default function TableSearch() {
 				{sortedAndFilteredResults.length > 0 && !isLoading && (
 					<div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-yellow-200 dark:border-yellow-800 rounded-lg overflow-hidden shadow-xl shadow-yellow-500/20">
 						<div className="overflow-x-auto">
-							<table className="w-full text-sm">
+							<table className="w-full text-sm" ref={tableRef}>
 								<thead className="bg-gradient-to-r from-yellow-100 via-orange-100 to-yellow-100 dark:from-yellow-950/30 dark:via-orange-950/30 dark:to-yellow-950/30 border-b border-yellow-200 dark:border-yellow-700">
 									<tr>
 										<th className="px-4 py-3 text-left font-medium">#</th>
@@ -204,13 +237,26 @@ export default function TableSearch() {
 									</tr>
 								</thead>
 								<tbody className="divide-y divide-yellow-200/50 dark:divide-yellow-800/50">
-									{sortedAndFilteredResults.map((result, idx) => (
-										<TableSnapshotRow
-											key={`${result.timestamp}-${result.url}-${idx}`}
-											snapshot={result}
-											index={idx}
-										/>
-									))}
+									{paddingTop > 0 && (
+										<tr>
+											<td style={{ height: `${paddingTop}px` }} colSpan={6} />
+										</tr>
+									)}
+									{virtualItems.map((virtualRow) => {
+										const result = sortedAndFilteredResults[virtualRow.index];
+										return (
+											<TableSnapshotRow
+												key={`${result.timestamp}-${result.url}-${virtualRow.index}`}
+												snapshot={result}
+												index={virtualRow.index}
+											/>
+										);
+									})}
+									{paddingBottom > 0 && (
+										<tr>
+											<td style={{ height: `${paddingBottom}px` }} colSpan={6} />
+										</tr>
+									)}
 								</tbody>
 							</table>
 						</div>
