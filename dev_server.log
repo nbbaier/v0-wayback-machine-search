@@ -1,0 +1,21 @@
+
+> my-v0-project@0.1.0 dev /app
+> next dev
+
+⚠ `eslint` configuration in next.config.mjs is no longer supported. See more info here: https://nextjs.org/docs/app/api-reference/cli/next#next-lint-options
+⚠ Invalid next.config.mjs options detected:
+⚠     Unrecognized key(s) in object: 'eslint'
+⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+
+✓ Starting...
+✓ Ready in 737ms
+○ Compiling /cards ...
+ GET /cards?url=example.com 200 in 4.1s (compile: 3.8s, render: 374ms)
+ GET /cards?url=example.com 200 in 79ms (compile: 6ms, render: 73ms)
+ GET /cards?url=example.com 200 in 68ms (compile: 4ms, render: 64ms)
+ GET /cards?url=example.com 200 in 83ms (compile: 7ms, render: 76ms)
+ GET /cards?url=example.com 200 in 68ms (compile: 4ms, render: 63ms)
+ GET /cards?url=example.com 200 in 84ms (compile: 6ms, render: 79ms)
