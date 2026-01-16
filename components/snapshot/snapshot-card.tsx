@@ -44,21 +44,21 @@ export const SnapshotCard = memo(function SnapshotCard({
 					)}
 				</div>
 
-				<a
-					href={`https://web.archive.org/web/${snapshot.timestamp}/${snapshot.url}`}
-					target="_blank"
-					rel="noopener noreferrer"
-					onClick={(e) => e.stopPropagation()}
-					className="shrink-0  "
+				<Button
+					size="sm"
+					asChild
+					className="bg-primary hover:opacity-90 text-primary-foreground shadow-md hover:shadow-lg hover:scale-105 transition-all shrink-0"
 				>
-					<Button
-						size="sm"
-						className="bg-primary hover:opacity-90 text-primary-foreground shadow-md hover:shadow-lg hover:scale-105 transition-all"
+					<a
+						href={`https://web.archive.org/web/${snapshot.timestamp}/${snapshot.url}`}
+						target="_blank"
+						rel="noopener noreferrer"
+						onClick={(e) => e.stopPropagation()}
 					>
 						<ExternalLink className="h-4 w-4 mr-1" />
 						Open Archive
-					</Button>
-				</a>
+					</a>
+				</Button>
 			</div>
 		</div>
 	);

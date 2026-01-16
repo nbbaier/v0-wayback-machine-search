@@ -123,6 +123,7 @@ export default function TableSearch() {
 								value={filter}
 								onChange={(e) => setFilter(e.target.value)}
 								className="w-full sm:w-64"
+								aria-label="Filter snapshots by URL, status, or type"
 							/>
 						</div>
 					</div>
