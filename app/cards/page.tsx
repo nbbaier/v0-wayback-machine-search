@@ -112,12 +112,12 @@ export default function CardsSearch() {
 
 				{groupedByDate.length > 0 && !isLoading && (
 					<div className="mb-6">
-						<p className="text-sm text-muted-foreground">
+						<output className="text-sm text-muted-foreground">
 							Found{" "}
 							{groupedByDate.reduce((acc, g) => acc + g.snapshots.length, 0)}{" "}
 							snapshots across {groupedByDate.length} days
 							{filter && " (filtered)"}
-						</p>
+						</output>
 					</div>
 				)}
 
