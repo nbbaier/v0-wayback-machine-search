@@ -13,6 +13,7 @@ import {
 } from "@/components/search/search-states";
 import { VirtualizedTable } from "@/components/snapshot/virtualized-table";
 import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 import { useWaybackSearch } from "@/lib/hooks/useWaybackSearch";
 import type { SortColumn, SortDirection } from "@/lib/types/archive";
 import { cleanUrl } from "@/lib/utils/formatters";
@@ -24,8 +25,8 @@ export default function TableSearch() {
 
 	const [searchUrl, setSearchUrl] = useState(urlParam);
 	const [filter, setFilter] = useState("");
-	// Defer the filter value to keep the UI responsive while filtering occurs
-	const deferredFilter = useDeferredValue(filter);
+	// Debounce filter to avoid re-sorting and re-filtering on every keystroke
+	const debouncedFilter = useDebounce(filter, 300);
 	const [sortColumn, setSortColumn] = useState<SortColumn>("timestamp");
 	const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
@@ -72,13 +73,14 @@ export default function TableSearch() {
 	const sortedAndFilteredResults = useMemo(() => {
 		let filtered = results;
 
-		if (deferredFilter) {
+		if (debouncedFilter) {
+			const lowerFilter = debouncedFilter.toLowerCase();
 			filtered = results.filter(
 				(r) =>
-					r.url.toLowerCase().includes(deferredFilter.toLowerCase()) ||
-					r.timestamp.includes(deferredFilter) ||
-					r.status.includes(deferredFilter) ||
-					r.mimetype.toLowerCase().includes(deferredFilter.toLowerCase()),
+					r.url.toLowerCase().includes(lowerFilter) ||
+					r.timestamp.includes(debouncedFilter) ||
+					r.status.includes(debouncedFilter) ||
+					r.mimetype.toLowerCase().includes(lowerFilter),
 			);
 		}
 
@@ -95,24 +97,7 @@ export default function TableSearch() {
 			if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
 			return 0;
 		});
-	}, [results, deferredFilter, sortColumn, sortDirection]);
-
-	// const virtualizer = useWindowVirtualizer({
-	// 	count: sortedAndFilteredResults.length,
-	// 	estimateSize: () => 53, // Approximate height of a row
-	// 	overscan: 10,
-	// 	scrollMargin: tableOffset,
-	// });
-
-	// const virtualItems = virtualizer.getVirtualItems();
-	// const totalSize = virtualizer.getTotalSize();
-
-	// const paddingTop =
-	// 	virtualItems.length > 0 ? virtualItems[0].start - tableOffset : 0;
-	// const paddingBottom =
-	// 	virtualItems.length > 0
-	// 		? totalSize - virtualItems[virtualItems.length - 1].end
-	// 		: 0;
+	}, [results, debouncedFilter, sortColumn, sortDirection]);
 
 	return (
 		<div className="min-h-screen bg-linear-to-br from-yellow-50 via-orange-50 to-amber-50 dark:from-gray-900 dark:via-yellow-900/20 dark:to-gray-900">
