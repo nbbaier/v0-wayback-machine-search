@@ -3,7 +3,7 @@
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { ArrowUpDown, Table2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { SearchForm } from "@/components/search/search-form";
 import { SearchHeader } from "@/components/search/search-header";
 import {
@@ -25,6 +25,8 @@ export default function TableSearch() {
 
 	const [searchUrl, setSearchUrl] = useState(urlParam);
 	const [filter, setFilter] = useState("");
+	// Defer the filter value to keep the UI responsive while filtering occurs
+	const deferredFilter = useDeferredValue(filter);
 	const [sortColumn, setSortColumn] = useState<SortColumn>("timestamp");
 	const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
@@ -71,13 +73,13 @@ export default function TableSearch() {
 	const sortedAndFilteredResults = useMemo(() => {
 		let filtered = results;
 
-		if (filter) {
+		if (deferredFilter) {
 			filtered = results.filter(
 				(r) =>
-					r.url.toLowerCase().includes(filter.toLowerCase()) ||
-					r.timestamp.includes(filter) ||
-					r.status.includes(filter) ||
-					r.mimetype.toLowerCase().includes(filter.toLowerCase()),
+					r.url.toLowerCase().includes(deferredFilter.toLowerCase()) ||
+					r.timestamp.includes(deferredFilter) ||
+					r.status.includes(deferredFilter) ||
+					r.mimetype.toLowerCase().includes(deferredFilter.toLowerCase()),
 			);
 		}
 
@@ -94,7 +96,7 @@ export default function TableSearch() {
 			if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
 			return 0;
 		});
-	}, [results, filter, sortColumn, sortDirection]);
+	}, [results, deferredFilter, sortColumn, sortDirection]);
 
 	const virtualizer = useWindowVirtualizer({
 		count: sortedAndFilteredResults.length,
