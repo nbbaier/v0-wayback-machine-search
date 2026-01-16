@@ -7,6 +7,7 @@ import { SearchForm } from "@/components/search/search-form";
 import { SearchHeader } from "@/components/search/search-header";
 import { EmptyState, LoadingState } from "@/components/search/search-states";
 import { CardsDateGroup } from "@/components/snapshot/cards-date-group";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 import { useWaybackSearch } from "@/lib/hooks/useWaybackSearch";
 import type { GroupedSnapshot } from "@/lib/types/archive";
 import { cleanUrl } from "@/lib/utils/formatters";
@@ -18,6 +19,8 @@ export default function CardsSearch() {
 
 	const [searchUrl, setSearchUrl] = useState(urlParam);
 	const [filter, setFilter] = useState("");
+	// Debounce filter to avoid re-calculating groups on every keystroke
+	const debouncedFilter = useDebounce(filter, 300);
 
 	useEffect(() => {
 		setSearchUrl(urlParam);
@@ -38,13 +41,13 @@ export default function CardsSearch() {
 	const groupedByDate = useMemo(() => {
 		let filtered = results;
 
-		if (filter) {
-			const lowerFilter = filter.toLowerCase();
+		if (debouncedFilter) {
+			const lowerFilter = debouncedFilter.toLowerCase();
 			filtered = results.filter(
 				(r) =>
 					r.url.toLowerCase().includes(lowerFilter) ||
-					r.timestamp.includes(filter) ||
-					r.status.includes(filter) ||
+					r.timestamp.includes(debouncedFilter) ||
+					r.status.includes(debouncedFilter) ||
 					r.mimetype.toLowerCase().includes(lowerFilter),
 			);
 		}
@@ -67,7 +70,7 @@ export default function CardsSearch() {
 				),
 			}))
 			.sort((a, b) => b.date.localeCompare(a.date));
-	}, [results, filter]);
+	}, [results, debouncedFilter]);
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">

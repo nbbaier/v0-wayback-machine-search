@@ -13,6 +13,7 @@ import {
 } from "@/components/search/search-states";
 import { TableSnapshotRow } from "@/components/snapshot/table-snapshot-row";
 import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 import { useWaybackSearch } from "@/lib/hooks/useWaybackSearch";
 import type { SortColumn, SortDirection } from "@/lib/types/archive";
 import { cleanUrl } from "@/lib/utils/formatters";
@@ -24,6 +25,8 @@ export default function TableSearch() {
 
 	const [searchUrl, setSearchUrl] = useState(urlParam);
 	const [filter, setFilter] = useState("");
+	// Debounce filter to avoid re-sorting and re-filtering on every keystroke
+	const debouncedFilter = useDebounce(filter, 300);
 	const [sortColumn, setSortColumn] = useState<SortColumn>("timestamp");
 	const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
@@ -55,19 +58,20 @@ export default function TableSearch() {
 	const sortedAndFilteredResults = useMemo(() => {
 		let filtered = results;
 
-		if (filter) {
+		if (debouncedFilter) {
+			const lowerFilter = debouncedFilter.toLowerCase();
 			filtered = results.filter(
 				(r) =>
-					r.url.toLowerCase().includes(filter.toLowerCase()) ||
-					r.timestamp.includes(filter) ||
-					r.status.includes(filter) ||
-					r.mimetype.toLowerCase().includes(filter.toLowerCase()),
+					r.url.toLowerCase().includes(lowerFilter) ||
+					r.timestamp.includes(debouncedFilter) ||
+					r.status.includes(debouncedFilter) ||
+					r.mimetype.toLowerCase().includes(lowerFilter),
 			);
 		}
 
 		return [...filtered].sort((a, b) => {
-			let aVal: any = a[sortColumn] || "";
-			let bVal: any = b[sortColumn] || "";
+			let aVal: string | number = a[sortColumn] || "";
+			let bVal: string | number = b[sortColumn] || "";
 
 			if (sortColumn === "length") {
 				aVal = parseInt(a.length || "0", 10);
@@ -78,7 +82,7 @@ export default function TableSearch() {
 			if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
 			return 0;
 		});
-	}, [results, filter, sortColumn, sortDirection]);
+	}, [results, debouncedFilter, sortColumn, sortDirection]);
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50 dark:from-gray-900 dark:via-yellow-900/20 dark:to-gray-900">
