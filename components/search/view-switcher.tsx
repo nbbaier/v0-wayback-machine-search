@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutGrid, Table2, Sparkles } from "lucide-react";
+import { LayoutGrid, Sparkles, Table2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -46,7 +46,7 @@ export function ViewSwitcher() {
 							"flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
 							isActive
 								? "bg-background text-foreground shadow-sm"
-								: "text-muted-foreground hover:text-foreground hover:bg-background/50"
+								: "text-muted-foreground hover:text-foreground hover:bg-background/50",
 						)}
 					>
 						<Icon className="h-4 w-4" />

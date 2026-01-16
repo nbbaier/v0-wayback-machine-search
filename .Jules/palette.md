@@ -15,3 +15,7 @@
 ## 2024-05-22 - Explicit Text vs Standard Iconography
 **Learning:** Users often scan UI elements. Explicit instructions like "Click to expand" can feel cluttered. Replacing them with standard affordances (like a chevron) reduces cognitive load while maintaining discoverability.
 **Action:** Prefer standard icons (arrows, chevrons) over text instructions for common interactions like expanding/collapsing, unless the interaction is non-standard.
+
+## 2024-05-22 - Invalid Button Nesting
+**Learning:** Found `<a>` wrapping `<Button>` in `SnapshotCard`, causing invalid HTML and potential accessibility issues. The `Button` component supports `asChild`, allowing correct semantic nesting.
+**Action:** Use `asChild` prop on `Button` components when they serve as links, placing the `<a>` tag inside.
