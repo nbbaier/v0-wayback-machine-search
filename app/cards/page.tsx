@@ -75,13 +75,13 @@ export default function CardsSearch() {
   }, [results, deferredFilter]);
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-background">
-      <div className="sticky top-0 z-20 border-border border-b bg-card/80 backdrop-blur-md">
-        <div className="mx-auto max-w-6xl px-4 py-4">
+    <div className="min-h-screen bg-background">
+      <div className="sticky top-0 z-20 border-border border-b bg-background/95 backdrop-blur-sm">
+        <div className="mx-auto max-w-3xl px-6 py-5">
           <SearchHeader
-            description="Snapshots grouped by date"
+            description="Explore the web's archived history"
             icon={LayoutGrid}
-            title="TimeVault Cards"
+            title="TimeVault"
           />
 
           <SearchForm
@@ -96,36 +96,33 @@ export default function CardsSearch() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 pt-0 pb-3">
+      <div className="mx-auto max-w-3xl px-6 py-8">
         {isLoading && <LoadingState />}
 
         {isError && (
           <LoadingState
-            cardClassName="border-destructive/50"
+            cardClassName="border-l-destructive"
             message="Failed to load snapshots"
           />
         )}
 
         {!(urlParam || isLoading) && (
           <EmptyState
-            description="Enter a URL to see snapshots grouped by date"
+            description="Enter a URL to explore its past versions"
             icon={Calendar}
             title="Search the Archive"
           />
         )}
 
         {groupedByDate.length > 0 && !isLoading && (
-          <div className="mb-6">
-            <output className="text-muted-foreground text-sm">
-              Found{" "}
-              {groupedByDate.reduce((acc, g) => acc + g.snapshots.length, 0)}{" "}
-              snapshots across {groupedByDate.length} days
-              {filter && " (filtered)"}
-            </output>
-          </div>
+          <p className="mb-6 text-muted-foreground text-sm">
+            {groupedByDate.reduce((acc, g) => acc + g.snapshots.length, 0)}{" "}
+            snapshots across {groupedByDate.length} days
+            {filter && " (filtered)"}
+          </p>
         )}
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {groupedByDate.map((group) => (
             <CardsDateGroup group={group} key={group.date} />
           ))}

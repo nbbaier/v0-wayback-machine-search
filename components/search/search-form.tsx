@@ -1,3 +1,4 @@
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -9,9 +10,6 @@ interface SearchFormProps {
   filter?: string;
   onFilterChange?: (value: string) => void;
   showFilter?: boolean;
-  buttonText?: string;
-  buttonLoadingText?: string;
-  buttonClassName?: string;
 }
 
 export function SearchForm({
@@ -22,14 +20,11 @@ export function SearchForm({
   filter,
   onFilterChange,
   showFilter = false,
-  buttonText = "Search",
-  buttonLoadingText = "Searching...",
-  buttonClassName = "bg-primary hover:opacity-90",
 }: SearchFormProps) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <form
-        className="flex gap-2"
+        className="flex items-end gap-3"
         onSubmit={(e) => {
           e.preventDefault();
           onSearch();
@@ -40,24 +35,21 @@ export function SearchForm({
           className="flex-1"
           inputMode="url"
           onChange={(e) => onSearchUrlChange(e.target.value)}
-          placeholder="https://example.com"
+          placeholder="Enter URL to explore its past versions..."
           type="url"
           value={searchUrl}
         />
-        <Button
-          aria-busy={isLoading}
-          className={buttonClassName}
-          disabled={isLoading}
-          type="submit"
-        >
-          {isLoading ? buttonLoadingText : buttonText}
+        <Button aria-busy={isLoading} disabled={isLoading} type="submit">
+          <Search className="h-4 w-4" />
+          <span className="hidden sm:inline">
+            {isLoading ? "Searching..." : "Search Archive"}
+          </span>
         </Button>
       </form>
 
       {showFilter && onFilterChange && (
         <Input
           aria-label="Filter snapshots"
-          className="w-full"
           onChange={(e) => onFilterChange(e.target.value)}
           placeholder="Filter snapshots..."
           value={filter || ""}

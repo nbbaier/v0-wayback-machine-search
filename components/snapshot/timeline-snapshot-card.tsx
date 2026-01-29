@@ -1,9 +1,6 @@
-import { ExternalLink } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import type { ArchiveResult } from "@/lib/types/archive";
-import { formatTimestamp } from "@/lib/utils/formatters";
-import { SnapshotMetadata } from "./snapshot-metadata";
-import { SnapshotPreview } from "./snapshot-preview";
+import { formatBytes, formatTimestamp } from "@/lib/utils/formatters";
+import { StatusBadge } from "./status-badge";
 
 interface TimelineSnapshotCardProps {
   snapshot: ArchiveResult;
@@ -11,35 +8,22 @@ interface TimelineSnapshotCardProps {
 
 export function TimelineSnapshotCard({ snapshot }: TimelineSnapshotCardProps) {
   return (
-    <Card className="overflow-hidden border-purple-200/50 bg-white/80 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/20 dark:border-purple-800/50 dark:bg-gray-900/80">
-      <CardContent className="p-4">
-        <div className="flex flex-col gap-4 sm:flex-row">
-          <SnapshotPreview mimetype={snapshot.mimetype} />
-
-          <div className="min-w-0 flex-1">
-            <SnapshotMetadata
-              length={snapshot.length}
-              mimetype={snapshot.mimetype}
-              showStatusColor={false}
-              status={snapshot.status}
-            />
-
-            <p className="mt-2 mb-2 text-gray-700 text-sm dark:text-gray-300">
-              {formatTimestamp(snapshot.timestamp)}
-            </p>
-
-            <a
-              className="inline-flex items-center gap-2 text-purple-600 text-sm hover:underline dark:text-purple-400"
-              href={`https://web.archive.org/web/${snapshot.timestamp}/${snapshot.url}`}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              <ExternalLink className="h-4 w-4" />
-              View Snapshot
-            </a>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="border-primary/30 border-l-2 py-2 pr-4 pl-4 transition-colors hover:border-primary hover:bg-muted/30">
+      <p className="truncate text-foreground text-sm">{snapshot.url}</p>
+      <div className="mt-1 flex items-center gap-3 text-muted-foreground text-xs">
+        <span className="font-mono">{formatTimestamp(snapshot.timestamp)}</span>
+        <StatusBadge status={snapshot.status} />
+        <span>{snapshot.mimetype}</span>
+        {snapshot.length && <span>{formatBytes(snapshot.length)}</span>}
+      </div>
+      <a
+        className="mt-1 inline-block text-primary text-xs underline-offset-4 hover:underline"
+        href={`https://web.archive.org/web/${snapshot.timestamp}/${snapshot.url}`}
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        View Snapshot
+      </a>
+    </div>
   );
 }

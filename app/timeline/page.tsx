@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Sparkles } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { SearchForm } from "@/components/search/search-form";
@@ -11,7 +11,6 @@ import {
   NoResultsState,
 } from "@/components/search/search-states";
 import { TimelineGroup } from "@/components/snapshot/timeline-group";
-import { Badge } from "@/components/ui/badge";
 import { useWaybackSearch } from "@/lib/hooks/use-wayback-search";
 import type { GroupedSnapshotByMonth } from "@/lib/types/archive";
 import { cleanUrl } from "@/lib/utils/formatters";
@@ -74,20 +73,16 @@ export default function TimelineSearch() {
   }, [results]);
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-primary/5 via-primary/10 to-background dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
-      <div className="sticky top-0 z-20 border-gray-200 border-b bg-white/80 backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/80">
-        <div className="mx-auto max-w-6xl px-4 py-4">
+    <div className="min-h-screen bg-background">
+      <div className="sticky top-0 z-20 border-border border-b bg-background/95 backdrop-blur-sm">
+        <div className="mx-auto max-w-3xl px-6 py-5">
           <SearchHeader
             description="Visual journey through time"
-            icon={Sparkles}
-            iconBgClass="bg-gradient-to-br from-purple-500 via-fuchsia-600 to-pink-600"
+            icon={Clock}
             title="TimeVault Timeline"
-            titleGradient="from-purple-600 via-fuchsia-600 to-pink-600"
           />
 
           <SearchForm
-            buttonClassName="bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 hover:from-purple-700 hover:via-fuchsia-700 hover:to-pink-700"
-            buttonText="Explore"
             isLoading={isLoading}
             onSearch={handleSearch}
             onSearchUrlChange={setSearchUrl}
@@ -96,56 +91,42 @@ export default function TimelineSearch() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 py-6">
+      <div className="mx-auto max-w-3xl px-6 py-8">
         {availableYears.length > 0 && (
           <div className="mb-6 flex flex-wrap items-center gap-2">
-            <span className="font-medium text-gray-700 text-sm dark:text-gray-300">
+            <span className="text-muted-foreground text-sm">
               Filter by year:
             </span>
-            <Badge
-              className="cursor-pointer"
+            <button
+              className={`text-sm ${selectedYear === "" ? "text-primary underline underline-offset-4" : "text-muted-foreground hover:text-foreground"}`}
               onClick={() => setSelectedYear("")}
-              variant={selectedYear === "" ? "default" : "secondary"}
+              type="button"
             >
               All ({results.length})
-            </Badge>
+            </button>
             {availableYears.map((year) => (
-              <Badge
-                className="cursor-pointer"
+              <button
+                className={`text-sm ${selectedYear === year ? "text-primary underline underline-offset-4" : "text-muted-foreground hover:text-foreground"}`}
                 key={year}
                 onClick={() => setSelectedYear(year)}
-                variant={selectedYear === year ? "default" : "secondary"}
+                type="button"
               >
                 {year} (
                 {results.filter((r) => r.timestamp.startsWith(year)).length})
-              </Badge>
+              </button>
             ))}
           </div>
         )}
 
-        {isLoading && (
-          <LoadingState
-            cardClassName="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-purple-200 dark:border-purple-800"
-            iconClass="text-purple-600 dark:text-purple-400"
-            message="Traveling through time..."
-          />
-        )}
+        {isLoading && <LoadingState message="Loading timeline..." />}
 
-        {isError && (
-          <LoadingState
-            cardClassName="border-red-300 dark:border-red-800"
-            message="Failed to load timeline"
-          />
-        )}
+        {isError && <LoadingState message="Failed to load timeline" />}
 
         {!(urlParam || isLoading) && (
           <EmptyState
-            cardClassName="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-purple-200 dark:border-purple-800"
-            description="Enter a URL to visualize its history on the timeline"
+            description="Enter a URL to visualize its history"
             icon={Calendar}
-            iconBgClass="bg-gradient-to-br from-purple-500 via-fuchsia-600 to-pink-600"
-            title="Start Your Journey"
-            titleGradient="from-purple-600 via-fuchsia-600 to-pink-600"
+            title="Explore the Timeline"
           />
         )}
 
@@ -153,9 +134,9 @@ export default function TimelineSearch() {
 
         {groupedByYearMonth.length > 0 && !isLoading && (
           <div className="relative">
-            <div className="absolute top-0 bottom-0 left-4 w-0.5 bg-linear-to-b from-primary via-accent to-primary md:left-1/2" />
+            <div className="absolute top-0 bottom-0 left-4 w-px bg-border md:left-1/2" />
 
-            <div className="space-y-8">
+            <div className="space-y-6">
               {groupedByYearMonth.map((group, groupIdx) => (
                 <TimelineGroup
                   group={group}
