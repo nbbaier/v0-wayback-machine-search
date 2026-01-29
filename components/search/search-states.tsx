@@ -69,7 +69,7 @@ export function EmptyState({
         <Icon className="h-16 w-16 text-primary-foreground" />
       </div>
       <h3
-        className={`mb-2 bg-gradient-to-r font-bold text-xl ${titleGradient} bg-clip-text text-transparent`}
+        className={`mb-2 bg-linear-to-r font-bold text-xl ${titleGradient} bg-clip-text text-transparent`}
       >
         {title}
       </h3>
