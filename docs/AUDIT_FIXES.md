@@ -35,29 +35,29 @@ return `/api/wayback?${searchParams.toString()}`;
 
 **Fix:** Added comprehensive validation:
 
--  URL parameter required and trimmed
--  URL length capped at 2000 characters
--  Year parameters validated as 4-digit YYYY format
+- URL parameter required and trimmed
+- URL length capped at 2000 characters
+- Year parameters validated as 4-digit YYYY format
 
 ```typescript
 if (!url || !url.trim()) {
    return NextResponse.json(
       { error: "URL parameter is required" },
-      { status: 400 }
+      { status: 400 },
    );
 }
 
 if (url.length > 2000) {
    return NextResponse.json(
       { error: "URL parameter is too long" },
-      { status: 400 }
+      { status: 400 },
    );
 }
 
 if (from && !/^\d{4}$/.test(from)) {
    return NextResponse.json(
       { error: "from parameter must be YYYY" },
-      { status: 400 }
+      { status: 400 },
    );
 }
 ```
@@ -137,9 +137,9 @@ headers: {
 
 **Impact:**
 
--  CDN can cache responses for 24 hours
--  Stale-while-revalidate provides graceful background updates
--  Prevents search engines from indexing API endpoints
+- CDN can cache responses for 24 hours
+- Stale-while-revalidate provides graceful background updates
+- Prevents search engines from indexing API endpoints
 
 ---
 
@@ -207,9 +207,9 @@ export const formatBytes = (bytes: string | number | undefined): string => {
 
 **Impact:**
 
--  Gracefully handles invalid inputs
--  Centralized logic (DRY principle)
--  Type-safe with proper guards
+- Gracefully handles invalid inputs
+- Centralized logic (DRY principle)
+- Type-safe with proper guards
 
 ---
 
@@ -230,49 +230,44 @@ pnpm run build
 ### High Priority
 
 1. **Package.json cleanup**
-
-   -  Remove unused Radix packages
-   -  Pin versions (avoid "latest")
-   -  Downgrade from React 19 RC to stable
+   - Remove unused Radix packages
+   - Pin versions (avoid "latest")
+   - Downgrade from React 19 RC to stable
 
 2. **Fix next.config.mjs**
-
-   -  Remove `ignoreDuringBuilds: true`
-   -  Remove `ignoreBuildErrors: true`
-   -  Fix actual TypeScript/ESLint errors
+   - Remove `ignoreDuringBuilds: true`
+   - Remove `ignoreBuildErrors: true`
+   - Fix actual TypeScript/ESLint errors
 
 3. **Virtual list improvements**
-   -  Add stable keys (`getItemKey`)
-   -  Implement `measureElement` for accurate heights
-   -  Prevent rendering drift
+   - Add stable keys (`getItemKey`)
+   - Implement `measureElement` for accurate heights
+   - Prevent rendering drift
 
 ### Medium Priority
 
 4. **Create shared types**
-
-   -  Extract `ArchiveResult` to `lib/types.ts`
-   -  Remove duplication across files
+   - Extract `ArchiveResult` to `lib/types.ts`
+   - Remove duplication across files
 
 5. **Basic rate limiting**
-
-   -  Add IP-based throttling to API route
-   -  Protect against abuse
+   - Add IP-based throttling to API route
+   - Protect against abuse
 
 6. **Convert static pages to Server Components**
-   -  Remove unnecessary `"use client"` from homepage
-   -  Reduce client bundle size
+   - Remove unnecessary `"use client"` from homepage
+   - Reduce client bundle size
 
 ### Low Priority
 
 7. **Add testing**
-
-   -  API route tests (validation, caching)
-   -  Hook tests (data transformation)
-   -  Component smoke tests
+   - API route tests (validation, caching)
+   - Hook tests (data transformation)
+   - Component smoke tests
 
 8. **TypeScript strictness**
-   -  Consider `skipLibCheck: false` in CI
-   -  Remove `allowJs` if not needed
+   - Consider `skipLibCheck: false` in CI
+   - Remove `allowJs` if not needed
 
 ---
 

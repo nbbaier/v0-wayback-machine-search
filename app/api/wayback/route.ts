@@ -7,10 +7,10 @@ export const dynamic = "force-dynamic";
  * Cache entry structure for storing CDX API responses
  */
 interface CacheEntry {
-	/** The raw CDX API response data (array of arrays) */
-	data: string[][];
-	/** Unix timestamp (ms) when this entry was cached */
-	timestamp: number;
+  /** The raw CDX API response data (array of arrays) */
+  data: string[][];
+  /** Unix timestamp (ms) when this entry was cached */
+  timestamp: number;
 }
 
 /**
@@ -30,6 +30,7 @@ const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
  * Maximum number of entries in the cache to prevent memory exhaustion
  */
 const MAX_CACHE_ENTRIES = 500;
+const YEAR_REGEX = /^\d{4}$/;
 
 /**
  * Performs lazy cleanup of expired cache entries
@@ -43,12 +44,12 @@ const MAX_CACHE_ENTRIES = 500;
  * - O(n) complexity where n is the number of cache entries
  */
 function cleanupExpiredEntries() {
-	const now = Date.now();
-	for (const [key, entry] of cache.entries()) {
-		if (now - entry.timestamp > CACHE_TTL) {
-			cache.delete(key);
-		}
-	}
+  const now = Date.now();
+  for (const [key, entry] of cache.entries()) {
+    if (now - entry.timestamp > CACHE_TTL) {
+      cache.delete(key);
+    }
+  }
 }
 
 /**
@@ -56,21 +57,23 @@ function cleanupExpiredEntries() {
  * Implements a simple LRU-like eviction strategy based on timestamp
  */
 function evictIfNeeded() {
-	if (cache.size <= MAX_CACHE_ENTRIES) return;
+  if (cache.size <= MAX_CACHE_ENTRIES) {
+    return;
+  }
 
-	let oldestKey: string | null = null;
-	let oldestTimestamp = Infinity;
+  let oldestKey: string | null = null;
+  let oldestTimestamp = Number.POSITIVE_INFINITY;
 
-	for (const [key, entry] of cache.entries()) {
-		if (entry.timestamp < oldestTimestamp) {
-			oldestTimestamp = entry.timestamp;
-			oldestKey = key;
-		}
-	}
+  for (const [key, entry] of cache.entries()) {
+    if (entry.timestamp < oldestTimestamp) {
+      oldestTimestamp = entry.timestamp;
+      oldestKey = key;
+    }
+  }
 
-	if (oldestKey) {
-		cache.delete(oldestKey);
-	}
+  if (oldestKey) {
+    cache.delete(oldestKey);
+  }
 }
 
 /**
@@ -117,120 +120,124 @@ function evictIfNeeded() {
  * - Storage: In-memory Map (lost on server restart)
  */
 export async function GET(request: NextRequest) {
-	try {
-		// Perform lazy cleanup of expired cache entries
-		cleanupExpiredEntries();
+  try {
+    // Perform lazy cleanup of expired cache entries
+    cleanupExpiredEntries();
 
-		const searchParams = request.nextUrl.searchParams;
-		const url = searchParams.get("url");
+    const searchParams = request.nextUrl.searchParams;
+    const url = searchParams.get("url");
 
-		// Input validation
-		if (!url || !url.trim()) {
-			return NextResponse.json(
-				{ error: "URL parameter is required" },
-				{ status: 400 },
-			);
-		}
+    // Input validation
+    if (!url?.trim()) {
+      return NextResponse.json(
+        { error: "URL parameter is required" },
+        { status: 400 }
+      );
+    }
 
-		if (url.length > 2000) {
-			return NextResponse.json(
-				{ error: "URL parameter is too long (max 2000 characters)" },
-				{ status: 400 },
-			);
-		}
+    if (url.length > 2000) {
+      return NextResponse.json(
+        { error: "URL parameter is too long (max 2000 characters)" },
+        { status: 400 }
+      );
+    }
 
-		const from = searchParams.get("from");
-		const to = searchParams.get("to");
+    const from = searchParams.get("from");
+    const to = searchParams.get("to");
 
-		// Validate year parameters if provided
-		if (from && !/^\d{4}$/.test(from)) {
-			return NextResponse.json(
-				{ error: "from parameter must be a 4-digit year (YYYY)" },
-				{ status: 400 },
-			);
-		}
+    // Validate year parameters if provided
+    if (from && !YEAR_REGEX.test(from)) {
+      return NextResponse.json(
+        { error: "from parameter must be a 4-digit year (YYYY)" },
+        { status: 400 }
+      );
+    }
 
-		if (to && !/^\d{4}$/.test(to)) {
-			return NextResponse.json(
-				{ error: "to parameter must be a 4-digit year (YYYY)" },
-				{ status: 400 },
-			);
-		}
+    if (to && !YEAR_REGEX.test(to)) {
+      return NextResponse.json(
+        { error: "to parameter must be a 4-digit year (YYYY)" },
+        { status: 400 }
+      );
+    }
 
-		const urlParam = url.trim();
+    const urlParam = url.trim();
 
-		// Build CDX API query
-		const cdxUrl = new URL("https://web.archive.org/cdx/search/cdx");
-		cdxUrl.searchParams.set("url", urlParam);
-		cdxUrl.searchParams.set("output", "json");
-		cdxUrl.searchParams.set(
-			"fl",
-			"timestamp,original,statuscode,mimetype,length",
-		);
+    // Build CDX API query
+    const cdxUrl = new URL("https://web.archive.org/cdx/search/cdx");
+    cdxUrl.searchParams.set("url", urlParam);
+    cdxUrl.searchParams.set("output", "json");
+    cdxUrl.searchParams.set(
+      "fl",
+      "timestamp,original,statuscode,mimetype,length"
+    );
 
-		// Pass through year filters if provided
-		if (from) cdxUrl.searchParams.set("from", from);
-		if (to) cdxUrl.searchParams.set("to", to);
+    // Pass through year filters if provided
+    if (from) {
+      cdxUrl.searchParams.set("from", from);
+    }
+    if (to) {
+      cdxUrl.searchParams.set("to", to);
+    }
 
-		cdxUrl.searchParams.set("limit", "1000");
+    cdxUrl.searchParams.set("limit", "1000");
 
-		// Create cache key from the full CDX URL
-		const cacheKey = cdxUrl.toString();
+    // Create cache key from the full CDX URL
+    const cacheKey = cdxUrl.toString();
 
-		// Check cache first
-		const cached = cache.get(cacheKey);
-		if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-			console.log("[v0] Cache hit for:", cacheKey);
-			return NextResponse.json(cached.data, {
-				headers: {
-					"X-Cache": "HIT",
-					"Cache-Control":
-						"public, max-age=0, s-maxage=86400, stale-while-revalidate=3600",
-					"X-Robots-Tag": "noindex",
-				},
-			});
-		}
+    // Check cache first
+    const cached = cache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      console.log("[v0] Cache hit for:", cacheKey);
+      return NextResponse.json(cached.data, {
+        headers: {
+          "X-Cache": "HIT",
+          "Cache-Control":
+            "public, max-age=0, s-maxage=86400, stale-while-revalidate=3600",
+          "X-Robots-Tag": "noindex",
+        },
+      });
+    }
 
-		console.log("[v0] Cache miss, fetching from CDX API:", cdxUrl.toString());
+    console.log("[v0] Cache miss, fetching from CDX API:", cdxUrl.toString());
 
-		// Fetch from CDX API with Next.js caching and User-Agent
-		const response = await fetch(cdxUrl.toString(), {
-			next: { revalidate: 86400 }, // Cache for 24 hours
-			headers: {
-				"User-Agent": "TimeVault/1.0 (Wayback Machine Search Interface)",
-			},
-		});
+    // Fetch from CDX API with Next.js caching and User-Agent
+    const response = await fetch(cdxUrl.toString(), {
+      next: { revalidate: 86_400 }, // Cache for 24 hours
+      headers: {
+        "User-Agent": "TimeVault/1.0 (Wayback Machine Search Interface)",
+      },
+    });
 
-		if (!response.ok) {
-			return NextResponse.json(
-				{ error: `Wayback Machine API error: ${response.status}` },
-				{ status: response.status },
-			);
-		}
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: `Wayback Machine API error: ${response.status}` },
+        { status: response.status }
+      );
+    }
 
-		const data = await response.json();
-		console.log("[v0] Total snapshots returned:", data.length - 1); // -1 for header row
+    const data = await response.json();
+    console.log("[v0] Total snapshots returned:", data.length - 1); // -1 for header row
 
-		// Store in cache (evict oldest if needed)
-		evictIfNeeded();
-		cache.set(cacheKey, {
-			data,
-			timestamp: Date.now(),
-		});
+    // Store in cache (evict oldest if needed)
+    evictIfNeeded();
+    cache.set(cacheKey, {
+      data,
+      timestamp: Date.now(),
+    });
 
-		return NextResponse.json(data, {
-			headers: {
-				"X-Cache": "MISS",
-				"Cache-Control":
-					"public, max-age=0, s-maxage=86400, stale-while-revalidate=3600",
-				"X-Robots-Tag": "noindex",
-			},
-		});
-	} catch (error) {
-		console.error("Wayback API error:", error);
-		return NextResponse.json(
-			{ error: "Failed to fetch from Wayback Machine" },
-			{ status: 500 },
-		);
-	}
+    return NextResponse.json(data, {
+      headers: {
+        "X-Cache": "MISS",
+        "Cache-Control":
+          "public, max-age=0, s-maxage=86400, stale-while-revalidate=3600",
+        "X-Robots-Tag": "noindex",
+      },
+    });
+  } catch (error) {
+    console.error("Wayback API error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch from Wayback Machine" },
+      { status: 500 }
+    );
+  }
 }
