@@ -24,7 +24,7 @@ export const CardsDateGroup = memo(function CardsDateGroup({
 					<Calendar className="h-5 w-5 text-primary" />
 				</div>
 				<div className="flex-1 text-left">
-					<h4 className="text-lg font-medium bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+					<h4 className="text-lg font-medium bg-linear-to-r from-primary to-primary/50 bg-clip-text text-transparent">
 						{formatDate(group.date)}
 					</h4>
 					<p className="text-muted-foreground text-sm group-data-[state=open]:hidden">
