@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutGrid, Sparkles, Table2 } from "lucide-react";
+import { LayoutGrid, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -10,11 +10,6 @@ const views = [
 		name: "Cards",
 		href: "/cards",
 		icon: LayoutGrid,
-	},
-	{
-		name: "Table",
-		href: "/table",
-		icon: Table2,
 	},
 	{
 		name: "Timeline",
