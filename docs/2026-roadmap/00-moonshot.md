@@ -16,9 +16,9 @@ Furthermore, if a user requests a URL and the latest snapshot is stale, Chronos 
 
 This moves the project from a "Passive Viewer" to an "Active Agent" and "Historical Analyst." It requires:
 
--  Integration with LLMs (OpenAI/Anthropic) to process HTML content at scale.
--  Integration with the "Save Page Now" API.
--  Complex orchestration of scraping, analyzing, and summarizing.
+- Integration with LLMs (OpenAI/Anthropic) to process HTML content at scale.
+- Integration with the "Save Page Now" API.
+- Complex orchestration of scraping, analyzing, and summarizing.
 
 ## Proposed Capabilities
 
@@ -30,8 +30,8 @@ Select a 5-year span. Chronos samples 1 snapshot per quarter, extracts the text,
 
 When a user searches for `startup.com`:
 
--  If the last snapshot is >30 days old: Trigger a live archival via SPN (Save Page Now).
--  Notify the user: "We just asked the Wayback Machine to archive this page for you. Check back in 5 minutes."
+- If the last snapshot is >30 days old: Trigger a live archival via SPN (Save Page Now).
+- Notify the user: "We just asked the Wayback Machine to archive this page for you. Check back in 5 minutes."
 
 ### 3. The "Visual Evolution" GIF
 
@@ -39,15 +39,15 @@ Auto-generate a timelapse GIF of the website's homepage over 10 years, stabilize
 
 ## Key Deliverables
 
--  [ ] **Agentic Backend:** A Python/Node service that orchestrates multi-step workflows.
--  [ ] **LLM Pipeline:** RAG (Retrieval Augmented Generation) over raw HTML snapshots.
--  [ ] **SPN Integration:** Authenticated connection to the Internet Archive's capture API.
+- [ ] **Agentic Backend:** A Python/Node service that orchestrates multi-step workflows.
+- [ ] **LLM Pipeline:** RAG (Retrieval Augmented Generation) over raw HTML snapshots.
+- [ ] **SPN Integration:** Authenticated connection to the Internet Archive's capture API.
 
 ## Risks & Open Questions
 
--  **Cost:** Processing millions of tokens of HTML through GPT-4 is expensive.
--  **Ethics:** We must respect `robots.txt` and not spam the Internet Archive.
--  **Accuracy:** LLMs hallucinate. We need strict grounding (citations to specific snapshots).
+- **Cost:** Processing millions of tokens of HTML through GPT-4 is expensive.
+- **Ethics:** We must respect `robots.txt` and not spam the Internet Archive.
+- **Accuracy:** LLMs hallucinate. We need strict grounding (citations to specific snapshots).
 
 ## Notes
 

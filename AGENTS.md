@@ -1,6 +1,7 @@
 # Agent Guidelines
 
 ## Commands
+
 - **Build:** `pnpm build`
 - **Dev:** `pnpm dev`
 - **Lint:** `pnpm lint` (uses Biome)
@@ -9,6 +10,7 @@
 - **Test:** No test runner configured currently.
 
 ## Code Style
+
 - **Formatting:** Follow Biome configuration (Tabs for indentation, Double quotes).
 - **Imports:** Use `import type` for type-only imports. Use `@/` alias for project root imports.
 - **Naming:** PascalCase for React components, camelCase for functions/variables.
