@@ -60,21 +60,25 @@ const fetcher = async (url: string): Promise<ArchiveResult[]> => {
   }
 
   // Transform the CDX API response into our snapshot format
-  const snapshots = data.slice(1).map((row: string[]) => {
-    // Validate that each row is an array with expected structure
-    if (!Array.isArray(row) || row.length < 5) {
-      throw new Error("Invalid API response: malformed data row");
-    }
+  const snapshots = data
+    .slice(1)
+    .reduce((acc: ArchiveResult[], row: string[]) => {
+      // Validate that each row is an array with expected structure
+      if (!Array.isArray(row) || row.length < 5) {
+        console.warn("Invalid API response: malformed data row", row);
+        return acc;
+      }
 
-    return {
-      timestamp: row[0],
-      url: row[1],
-      status: row[2],
-      mimetype: row[3],
-      length: row[4],
-      title: `Snapshot from ${formatDate(row[0])}`,
-    };
-  });
+      acc.push({
+        timestamp: row[0],
+        url: row[1],
+        status: row[2],
+        mimetype: row[3],
+        length: row[4],
+        title: `Snapshot from ${formatDate(row[0])}`,
+      });
+      return acc;
+    }, []);
 
   return snapshots;
 };
