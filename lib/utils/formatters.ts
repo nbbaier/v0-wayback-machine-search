@@ -27,10 +27,11 @@ export function formatTimestampShort(ts: string): string {
 }
 
 export function formatDate(dateStr: string): string {
-  const year = dateStr.slice(0, 4);
-  const month = dateStr.slice(4, 6);
-  const day = dateStr.slice(6, 8);
-  const date = new Date(`${year}-${month}-${day}`);
+  const year = Number.parseInt(dateStr.slice(0, 4), 10);
+  const month = Number.parseInt(dateStr.slice(4, 6), 10);
+  const day = Number.parseInt(dateStr.slice(6, 8), 10);
+  // Construct date using local time components to avoid timezone shifts
+  const date = new Date(year, month - 1, day);
 
   return date.toLocaleDateString("en-US", {
     weekday: "long",
@@ -90,9 +91,11 @@ export function formatBytesCompact(bytes: string | undefined): string {
 }
 
 export function cleanUrl(url: string): string {
-  let cleanUrl = url.trim();
-  if (!(cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://"))) {
-    cleanUrl = `https://${cleanUrl}`;
+  let formattedUrl = url.trim();
+  if (
+    !(formattedUrl.startsWith("http://") || formattedUrl.startsWith("https://"))
+  ) {
+    formattedUrl = `https://${formattedUrl}`;
   }
-  return cleanUrl;
+  return formattedUrl;
 }
