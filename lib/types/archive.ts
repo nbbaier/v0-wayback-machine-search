@@ -7,6 +7,8 @@ export interface ArchiveResult {
   length?: string;
 }
 
+export type Snapshot = ArchiveResult;
+
 export interface GroupedSnapshot {
   date: string;
   snapshots: ArchiveResult[];
